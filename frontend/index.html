@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard VVWEB + SQL Server</title>
+</head>
+<body>
+    <h1>Dados do Banco SQL Server</h1>
+    <div id="dados"></div>
+    <p><a href="Portfolio.html">Portfolio</a></p>
+
+    <script>
+    fetch('http://localhost:8000/exibir_dados.php')
+      .then(response => response.json())
+      .then(data => {
+          let html = '';
+          data.forEach(item => {
+              html += `ID: ${item.registro}`;
+          });
+          document.getElementById('dados').innerHTML = html;
+      })
+      .catch(err => console.error("Erro ao carregar dados: ", err));
+    </script>
+</body>
+</html>
