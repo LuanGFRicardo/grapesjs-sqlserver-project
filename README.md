@@ -6,6 +6,8 @@ Clone o repositório https://github.com/GrapesJS/grapesjs.git
 
 Execute em grapesjs `npm install` e `pnpm install`
 
+Execute pnpx grapesjs-cli serve
+
 1. Execute: `docker-compose up -d --build`.
 
 2. Acesse o frontend (GrapesJS) em: `http://localhost:8080`.
