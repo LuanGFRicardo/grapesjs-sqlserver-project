@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrapesJS Editor</title>
+
+  <!-- Adicione o GrapesJS CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/grapesjs@0.17.20/dist/css/grapes.min.css" rel="stylesheet" type="text/css">
+
+  <!-- Se você estiver usando dependências locais, insira o caminho correto aqui -->
+  <!-- <link href="path_to_local_grapesjs/dist/css/grapes.min.css" rel="stylesheet" /> -->
+
+  <!-- Importando o GrapesJS (versão mais recente via CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/grapesjs@0.17.20/dist/grapes.min.js"></script>
+
+  <!-- Caso use plugins adicionais, pode incluir seus arquivos aqui -->
+  <script src="https://cdn.jsdelivr.net/npm/grapesjs-preset-webpage@0.17.20/dist/grapesjs-preset-webpage.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/grapesjs-plugin-forms@0.17.20/dist/grapesjs-plugin-forms.min.js"></script>
+  
+  <!-- Carregue outros plugins ou bibliotecas adicionais, conforme necessário -->
+  
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+    }
+
+    #editor {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="editor"></div>
+
+  <script>
+    // Inicializando o GrapesJS
+    const editor = grapesjs.init({
+      container: '#editor',
+      fromElement: true,
+      height: '100%',
+      width: 'auto',
+      storageManager: false, // Se você quiser armazenar localmente, habilite aqui
+      plugins: [
+        'grapesjs-preset-webpage',  // Usando o preset para criação de páginas
+        'grapesjs-plugin-forms'     // Plugin para formulários
+        // Você pode adicionar mais plugins aqui conforme necessário
+      ],
+      pluginsOpts: {
+        'grapesjs-preset-webpage': {
+          // Configurações do preset (se necessário)
+        },
+        'grapesjs-plugin-forms': {
+          // Configurações do plugin de formulários (se necessário)
+        }
+      },
+    });
+
+    // Adicionando mais funcionalidades ou personalizações
+    // Exemplo: Adicionando blocos personalizados
+    editor.BlockManager.add('my-block', {
+      label: 'My Custom Block',
+      content: '<div class="my-block">Hello, world!</div>',
+    });
+  </script>
+
+</body>
+</html>

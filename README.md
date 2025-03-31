@@ -1,12 +1,16 @@
-# Projeto VVWEB + PHP + SQL Server com Docker
+# Projeto GrapesJS + PHP + SQL Server com Docker
 
 ## Como rodar o projeto:
 
-Clone o repositório https://github.com/GrapesJS/grapesjs.git
+Versão Node.js v18.12 necessária
 
-Execute em grapesjs `npm install` e `pnpm install`
+Clone o repositório `git clone --recurse-submodules https://github.com/GrapesJS/grapesjs.git` e acesse `cd grapesjs`
 
-Execute pnpx grapesjs-cli serve
+Execute `npm install -g pnpm`, `pnpm install`, `npm install --save-dev grapesjs-cli --legacy-peer-deps` e`npm install ajv@8 ajv-keywords@5 --save --legacy-peer-deps` 
+
+Copie o arquivo arquivo index para grapesjs-sqlserver-project\grapesjs\src\index e copie index.html para grapesjs\node_modules\grapesjs-cli\index.html 
+
+Execute `npx grapesjs-cli serve`
 
 1. Execute: `docker-compose up -d --build`.
 

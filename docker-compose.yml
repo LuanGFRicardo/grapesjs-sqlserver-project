@@ -54,7 +54,9 @@ services:
       - localhost-network
 
   grapesjs:
-    build: ./grapesjs  # Verifique se a pasta do Dockerfile está correta
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: grapesjs_container
     ports:
       - "8001:80"
@@ -62,7 +64,6 @@ services:
       - .:/app  # Garante que o diretório local seja montado no contêiner
     networks:
       - localhost-network
-
 
 networks:
   localhost-network:
