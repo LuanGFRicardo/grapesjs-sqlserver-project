@@ -38,7 +38,7 @@ services:
     ports:
       - "1450:1433"
     networks:
-        - localhost-network
+      - localhost-network
     restart: always
 
   backend:
@@ -54,16 +54,17 @@ services:
       - localhost-network
 
   grapesjs:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: grapesjs_container
-    ports:
-      - "8001:80"
+    build: ./grapesjs
+    container_name: grapesjs_server
     volumes:
-      - .:/app  # Garante que o diretório local seja montado no contêiner
+      - ./grapesjs:/app
+    ports:
+      - "8080:8080"
     networks:
       - localhost-network
+    depends_on:
+      - backend
+    restart: always
 
 networks:
   localhost-network:
