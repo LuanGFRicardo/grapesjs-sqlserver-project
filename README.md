@@ -1,16 +1,23 @@
 # Projeto GrapesJS + PHP + SQL Server com Docker
 
-## Como rodar o projeto:
+## Como rodar o projeto na máquina local:
 
 Versão Node.js v18.12 necessária
 
-Clone o repositório `git clone --recurse-submodules https://github.com/GrapesJS/grapesjs.git` e acesse `cd grapesjs`
+Clone o repositório `git clone --recurse-submodules https://github.com/GrapesJS/preset-newsletter` e acesse `cd preset-newsletter`
 
-Execute `npm install -g pnpm`, `pnpm install`, `npm install --save-dev grapesjs-cli --legacy-peer-deps` e`npm install ajv@8 ajv-keywords@5 --save --legacy-peer-deps` 
+Modifique em preset-newsletter/package.json:
 
-Copie o arquivo arquivo index para grapesjs-sqlserver-project\grapesjs\src\index e copie index.html para grapesjs\node_modules\grapesjs-cli\index.html 
+`"start": "concurrently \"node server.js\" \" grapesjs-cli serve\"",`
 
-Execute `npx grapesjs-cli serve`
+`  "devDependencies": {
+    "express": "^5.1.0",
+    "concurrently": "^8.0.1"
+  },`
+
+Execute `npm install` e `npm start`
+
+## Como rodar o projeto no Docker:
 
 1. Execute: `docker-compose up -d --build`.
 
@@ -20,6 +27,9 @@ Execute `npx grapesjs-cli serve`
 
 4. SQL Server estará disponível em `localhost:1433`.
 
+5. O estilo (CSS) e comportamento (JS) estará disponível em `http://localhost:8081/assets/`.
+
 ## Observação:
 - O backend PHP acessa o SQL Server diretamente via `sqlsrv`.
 - O frontend consome o backend via **fetch()**.
+- O arquivo server.js está configurado para servir arquivos estáticos atravpes do Express, apontando para o diretório `assets`.
