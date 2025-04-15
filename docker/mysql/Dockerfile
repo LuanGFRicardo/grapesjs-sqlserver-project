@@ -1,0 +1,8 @@
+FROM mysql:8.0
+
+ENV MYSQL_DATABASE=gpsjs \
+    MYSQL_USER=gpsjs-user \
+    MYSQL_PASSWORD=Vf8mw436^ \
+    MYSQL_ROOT_PASSWORD=root
+
+EXPOSE 3306

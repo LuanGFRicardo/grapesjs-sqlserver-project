@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mysql:
+    build: ./mysql
+    container_name: mysql_gpsjs
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gpsjs
+      MYSQL_USER: gpsjs-user
+      MYSQL_PASSWORD: Vf8mw436^
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - gpsjs-network
+
+  app:
+    build:
+      context: ./laravel
+    container_name: laravel_app
+    ports:
+      - "8000:8000"
+    working_dir: /var/www
+    volumes:
+      - ./laravel:/var/www
+    depends_on:
+      - mysql
+    networks:
+      - gpsjs-network
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: gpsjs
+      DB_USERNAME: gpsjs-user
+      DB_PASSWORD: Vf8mw436^
+    command: >
+      sh -c "
+        until nc -z mysql 3306;
+        do
+          echo 'Aguardando MySQL subir...';
+          sleep 2;
+        done &&
+        php artisan migrate &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+volumes:
+  mysql_data:
+
+networks:
+  gpsjs-network:
+    driver: bridge
