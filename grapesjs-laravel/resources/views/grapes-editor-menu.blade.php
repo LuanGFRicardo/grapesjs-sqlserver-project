@@ -10,7 +10,6 @@
   <div class="container mt-5">
     <h2 class="mb-4">Selecione um Template para Editar</h2>
   
-    {{-- Formulário para editar um template existente --}}
     <form id="templateForm" method="GET" action="">
       <div class="row g-3 align-items-center">
         <div class="col-auto">
@@ -29,7 +28,6 @@
   
     <hr class="my-4">
   
-    {{-- Formulário para criar um novo template --}}
     <h4>Criar Novo Template</h4>
     <form id="createTemplateForm">
       <div class="row g-3 align-items-center">
@@ -42,18 +40,20 @@
       </div>
     </form>
 
-    {{-- Formulário para consultar histórico de versões de templates --}}
     <div id="historico-container" class="mt-3" style="display: none;">
       <h5>Histórico de Modificações</h5>
       <ul id="historico-lista" class="list-group"></ul>
-    </div>    
+    </div>
+
+    <hr class="my-4">
+    <a class="btn btn-success" href="{{ url('componentes') }}">Gerenciar Componentes</a>
   </div>
   
   <script>
     const URL_BASE = "{{ env('URL_BASE', url('/')) }}";
     if (URL_BASE.endsWith('/')) URL_BASE = URL_BASE.slice(0, -1);
 
-    // Redirecionar para editor ao selecionar template existente
+    // Redirecionar para o editor ao selecionar template
     document.getElementById('templateForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('templateSelect').value;
@@ -88,7 +88,7 @@
       }
     });
 
-    // 
+    // Busca histórico de versões ao selecionar template
     document.getElementById('templateSelect').addEventListener('change', async function() {
       const nome = this.value;
       const historicoContainer = document.getElementById('historico-container');
@@ -107,18 +107,6 @@
         if (!Array.isArray(dados)) throw new Error("Formato inválido");
 
         const nomeVersao = encodeURIComponent(nome);
-
-        // dados.forEach(v => {
-        //   const li = document.createElement('li');
-        //   li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        //   li.innerHTML = `
-        //     <span>${new Date(v.data_criacao).toLocaleString()}</span>
-        //     <button class="btn btn-sm btn-outline-secondary ms-2" onclick="editarVersao(${v.id}, ${nomeVersao})">
-        //       Editar esta versão
-        //     </button>
-        //   `;
-        //   historicoLista.appendChild(li);
-        // });
 
         dados.forEach(v => {
           const li = document.createElement('li');
@@ -145,6 +133,7 @@
       }
     });
 
+    // Abre o editor com uma versão específica
     async function editarVersao(versaoId, nomeVersao) {
       try {
         const res = await fetch(`${URL_BASE}/api/template-versao/${versaoId}`);

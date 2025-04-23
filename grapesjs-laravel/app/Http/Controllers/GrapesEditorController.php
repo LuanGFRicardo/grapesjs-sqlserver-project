@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+use App\Http\Controllers\Controller;
 use App\Models\Template;
 use App\Models\TemplateHistorico;
 
@@ -15,6 +17,7 @@ class GrapesEditorController extends Controller
     
         $templateModel = Template::where('nome', $template)->firstOrFail();
     
+        // Recupera a versão específica ou a última salva
         $versao = $versaoId
             ? TemplateHistorico::where('id', $versaoId)
                 ->where('template_id', $templateModel->id)
@@ -38,13 +41,13 @@ class GrapesEditorController extends Controller
 
             \Log::info('Dados validados:', $validated);
 
-            // Cria ou recupera o template base (sem HTML nem projeto)
+            // Cria ou obtém o template principal
             $template = Template::firstOrCreate(
                 ['nome' => $validated['nome']],
                 ['data_cadastro' => now()]
             );
 
-            // Cria nova entrada no histórico
+            // Salva nova versão no histórico
             TemplateHistorico::create([
                 'template_id' => $template->id,
                 'html' => $validated['html'] ?? '',
@@ -69,6 +72,7 @@ class GrapesEditorController extends Controller
             return response()->json(['error' => 'Template não encontrado'], 404);
         }
 
+        // Recupera a versão mais recente do template
         $ultimoHistorico = TemplateHistorico::where('template_id', $template->id)
             ->orderByDesc('data_criacao')
             ->first();
@@ -86,96 +90,34 @@ class GrapesEditorController extends Controller
 
     public function menu()
     {
+        // Retorna lista de templates
         $templates = Template::all(['id', 'nome']);
         return view('grapes-editor-menu', compact('templates'));
     }
 
-    public function criarTemplate(Request $request)
-    {
-        try {
-            $nome = trim($request->input('nome'));
-
-            if (!$nome) {
-                return response()->json(['error' => 'Nome inválido'], 400);
-            }
-
-            if (Template::where('nome', $nome)->exists()) {
-                return response()->json(['error' => 'Template já existe'], 400);
-            }
-
-            // Cria template base
-            $template = Template::create([
-                'nome' => $nome,
-                'data_cadastro' => now()
-            ]);
-
-            // Define conteúdo inicial
-            $htmlPadrao = '<div class="container"><h1>Novo Template Criado</h1><p>Comece aqui...</p></div>';
-
-            $gjsJson = json_encode([
-                'assets' => [],
-                'styles' => [],
-                'pages' => [
-                    [
-                        'name' => $nome,
-                        'styles' => [],
-                        'frames' => [[
-                            'component' => [
-                                'tagName' => 'div',
-                                'components' => [
-                                    ['type' => 'text', 'content' => 'Novo template']
-                                ]
-                            ]
-                        ]]
-                    ]
-                ]
-            ], JSON_UNESCAPED_UNICODE);
-
-            // Cria versão inicial no histórico
-            TemplateHistorico::create([
-                'template_id' => $template->id,
-                'html' => $htmlPadrao,
-                'projeto' => $gjsJson,
-            ]);
-
-            return response()->json(['success' => true, 'nome' => $nome]);
-        } catch (\Exception $e) {
-            \Log::error('Erro ao criar template: ', ['erro' => $e->getMessage()]);
-            return response()->json(['error' => 'Erro ao buscar histórico.'], 500);
+    // Faz upload de imagem
+    public function uploadImagem(Request $request) {
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('uploads', 'public');
+            $url = Storage::url($path);
+            return response()->json(['url' => $url]);
         }
+
+        return response()->json(['error' => 'Nenhum arquivo enviado.'], 400);
     }
 
-    public function historicoTemplate($nome)
-    {
-        try {
-            $template = Template::where('nome', $nome)->firstOrFail();
+    // Deleta a imagem
+    // public function deletarImagem(Request $request) {
+    //     $url = $request->input('url');
 
-            $versoes = TemplateHistorico::where('template_id', $template->id)
-                ->orderByDesc('data_criacao')
-                ->get();
+    //     // Extrai o caminho relativo
+    //     $relativePath = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
 
-            return response()->json($versoes);
-        } catch (\Exception $e) {
-            \Log::error('Erro ao buscar histórico:', ['erro' => $e->getMessage()]);
-            return response()->json(['error' => 'Erro ao buscar histórico.'], 500);
-        }
-    }
+    //     if (Storage::disk('public')->exists($relativePath)) {
+    //         Storage::disk('public')->delete($relativePath);
+    //         return response()->json(['success' => true]);
+    //     }
 
-    public function buscarVersao($id) 
-    {
-        try {
-            $versao = TemplateHistorico::findOrFail($id);
-
-            return response()->json([
-                '' => $versao->id,
-                'html' => $versao->html,
-                'projeto' => $versao->projeto,
-                'data_criacao' => $versao->data_criacao,
-                'data_modificacao' => $versao->data_modificacao,
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Erro ao buscar versão:', ['erro' => $e->getMessage()]);
-            return response()->json(['error' => 'Erro ao buscar versão.'], 500);
-        }
-    }
+    //     return response()->json(['success' => false, 'message' => 'Arquivo não encontrado.']);
+    // }
 }

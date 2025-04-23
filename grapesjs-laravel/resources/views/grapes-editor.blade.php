@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Editor de Newsletter - GrapesJS</title>
+  <title>Editor GrapesJS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="template-name" content="{{ $template->nome }}">
-  <meta name="template-html" content="{{ $versao->html }}">
-  <meta name="template-projeto" content="{{ $versao->projeto }}">
+  <meta name="template-html" content="{{ rawurlencode($versao->html) }}">
+  <meta name="template-projeto" content="{{ rawurlencode($versao->projeto) }}">
   
   <script>
+    // Define URL base global sem barra no final
     window.APP_URL_BASE = "{{ env('URL_BASE', url('/')) }}".replace(/\/$/, '');
   </script>
 
@@ -21,19 +22,23 @@
     #gjs { height: 100vh; border: 3px solid #444; }
   </style>
 </head>
-<body>
+<body class="bg-gray-100 pt-[100px]">
 
   <div id="gjs"></div>
   <button onclick="salvarHistorico()">💾 Salvar</button>
   <button onclick="carregarUltimaVersao()">📂 Carregar Última Versão</button>  
   <button onclick="voltarParaMenu()">⬅️ Voltar ao Menu</button>
 
-  <!-- JS do GrapesJS -->
+  <!-- GrapesJS e plugins -->
   @foreach ([
-    'grapes.min.js', 'grapesjs-preset-webpage.min.js', 'grapesjs-plugin-forms.min.js',
-    'grapesjs-custom-code.min.js', 'grapesjs-navbar.min.js', 'grapesjs-tabs.min.js',
-    'grapesjs-tooltip.min.js', 'grapesjs-touch.min.js', 'grapesjs-typed.min.js',
-    'grapesjs-preset-newsletter.min.js', 'grapesjs-custom-block.js'
+    'grapes.min.js', 
+    'grapesjs-preset-webpage.min.js',
+    'grapesjs-preset-newsletter.js', 
+    'grapesjs-plugin-forms.min.js',
+    'grapesjs-custom-code.min.js',
+    'grapesjs-navbar.min.js',
+    'grapesjs-tooltip.min.js',
+    'grapesjs-custom-block.js'
   ] as $script)
     <script src="{{ asset("vendor/grapesjs/js/$script") }}"></script>
   @endforeach
@@ -69,7 +74,6 @@
         return res.json();
       })
       .then(data => {
-        console.log('✅ Histórico salvo:', data);
         alert('✅ Versão salva com sucesso!');
       })
       .catch(err => {
@@ -92,9 +96,25 @@
           throw new Error("Campo 'projeto' não recebido ou vazio.");
         }
 
-        editor.setComponents(data.html || '');
-        editor.setStyle(data.css || '');
         editor.loadProjectData(JSON.parse(data.projeto));
+
+        const doc = editor.Canvas.getDocument();
+        const head = doc.head;
+
+        // Aplica estilos ao iframe do editor
+        [
+          `${URL_BASE}/vendor/googleapis/css/googleapiscss.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/tailwind-build.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/base.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/components.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/tailwind.min.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/utilities.css`
+        ].forEach(href => {
+          const link = doc.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          head.appendChild(link);
+        });
       })
       .catch(err => {
         console.error("❌ Erro ao carregar histórico:", err);
@@ -107,9 +127,15 @@
     };
 
     const getCleanHtml = () => {
+      // Limpa os conteúdos dinâmicos antes de salvar
       const wrapper = editor.getWrapper();
       const sqlContainers = wrapper.find('[data-func^="sql:"]');
-      sqlContainers.forEach(c => c.components('<p>Carregando dados...</p>'));
+      
+      sqlContainers.forEach(c => {
+        const inner = c.components().at(0);
+        if (inner) inner.components('<p>Carregando...</p>');
+      });
+
       return editor.getHtml();
     };
 
@@ -120,29 +146,63 @@
         container: '#gjs',
         fromElement: true,
         plugins: [
-          'gjs-preset-newsletter', 'grapesjs-preset-webpage', 'grapesjs-plugin-forms',
-          'grapesjs-custom-code', 'grapesjs-navbar', 'grapesjs-tabs',
-          'grapesjs-tooltip', 'grapesjs-touch', 'grapesjs-typed', 'gjs-custom-blocks'
-        ],
-        pluginsOpts: {
-          'grapesjs-preset-newsletter': {
-            modalLabelImport: 'Paste all your code here below and click import',
-            modalLabelExport: 'Copy the code and use it wherever you want',
-            importPlaceholder: '<table class="table"><tr><td class="cell">Hello world!</td></tr></table>',
-            cellStyle: {
-              'font-size': '12px',
-              'font-weight': 300,
-              'vertical-align': 'top',
-              color: 'rgb(111, 119, 125)',
-              margin: 0,
-              padding: 0,
-            }
+          'grapesjs-preset-webpage',
+          // 'grapesjs-preset-newsletter', 
+          'grapesjs-plugin-forms',
+          'grapesjs-navbar',
+          'grapesjs-custom-code',
+          'grapesjs-tooltip',
+          'gjs-custom-blocks'
+        ], 
+        // pluginsOpts: {
+        //   'grapesjs-preset-newsletter': {
+        //     blocks: ['section', 'text', 'image', 'link', 'quote', 'grid-items'],
+        //     styleManager: false,
+        //     deviceManager: false,
+        //     modal: false,
+        //     panels: false,
+        //     commands: false,
+        //     useCustomTheme: false,
+        //   }
+        // },
+        assetManager: {
+          // Endpoint de upload de imagem
+          upload: `${URL_BASE}/api/upload-imagem`,
+          uploadName: 'file',
+          autoAdd: true,
+          multiUpload: false,
+          headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
           },
-          inlineCss: true,
-          codeViewerTheme: 'material'                
-        },
+          // Como a URL será usada após upload
+          uploadFile: (e) => {
+            const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+            const formData = new FormData();
+            formData.append('file', files[0]);
+            
+            fetch(`${URL_BASE}/api/upload-imagem`, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+              }
+            })
+            .then(res => res.json())
+            .then(result => {
+              if (result?.url) {
+                editor.AssetManager.add({ src: result.url });
+              } else {
+                alert('❌ Falha ao enviar imagem.');
+              }
+            })
+            .catch(err => {
+              console.error('Erro ao fazer upload de imagem: ', err);
+            });
+          }
+        }
       });
 
+      // Debounce para carregamento de dados
       let carregarTimeout = null;
       const carregarDadosDebounced = () => {
         clearTimeout(carregarTimeout);
@@ -152,6 +212,7 @@
       const carregarDados = () => {
         const wrapper = editor.getWrapper();
         const sqlContainers = wrapper.find('[data-func^="sql:"]');
+
         sqlContainers.forEach(container => {
           const funcValue = container.getAttributes()['data-func'];
           const [, tipo] = funcValue.split(':');
@@ -164,9 +225,8 @@
                 return;
               }
 
-              let html = "<ul>";
-              data.forEach(item => html += `<li>${item.Num_Registro}</li>`);
-              html += "</ul>";
+              let html = "";
+              data.forEach(item => html += `${item.Num_Registro}`);
 
               container.components(html);
             })
@@ -174,12 +234,72 @@
         });
       };
 
+      editor.on('load', () => {
+        const doc = editor.Canvas.getDocument();
+        const head = doc.head;
+
+        // Adiciona metadados e título no iframe do editor
+        const metaCharset = doc.createElement('meta');
+        metaCharset.setAttribute('charset', 'UTF-8');
+        head.appendChild(metaCharset);
+
+        const metaViewPort = ViewPort= doc.createElement('meta');
+        metaViewPort.name = "viewport";
+        metaViewPort.content = "width=device-width, initial-scale=1.0";
+        doc.head.appendChild(metaViewPort);
+
+        const title = doc.createElement('title');
+        title.innerText = `Editor ${nomeTemplate}`;
+        head.appendChild(title);
+
+        // Carrega estilos no iframe
+        [
+          `${URL_BASE}/vendor/googleapis/css/googleapiscss.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/tailwind-build.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/base.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/components.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/tailwind.min.css`,
+          `${URL_BASE}/vendor/tailwindcss/css/utilities.css`
+        ].forEach(href => {
+          const link = doc.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          head.appendChild(link);
+        });
+      });
+
+      // Evento para deletar imagem
+      // editor.on('asset:remove', asset => {
+      //   const imageUrl = asset.get('src');
+
+      //   fetch(`${URL_BASE}/api/deletar-imagem`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      //     },
+      //     body: JSON.stringify({ url: imageUrl })
+      //   })
+      //   .then(res => res.json())
+      //   .then(result => {
+      //     if (!result) {
+      //       console.warn('⚠️ Erro ao deletar imagem: ', result.message);
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.error('❌ Erro na exclusão da imagem:', err);
+      //   })
+      // });
+
+      // Evento para componentes dinâmicos
       editor.on('load', carregarDadosDebounced);
+
       editor.on('component:add', component => {
         const func = component.getAttributes()['data-func'];
         if (func?.startsWith('sql:')) carregarDadosDebounced();
       });
 
+      // Tipo de componente customizado
       editor.DomComponents.addType('sql-componente', {
         model: {
           defaults: {
@@ -187,20 +307,11 @@
             droppable: true,
             editable: false,
             attributes: { class: 'sql-bloco' },
-          },
-          init() {
-            this.on('change', () => {
-              const attr = this.getAttributes()['data-func'];
-              if (attr?.startsWith('sql:')) carregarDadosDebounced();
-            });
-          },
-          afterInit() {
-            const attr = this.getAttributes()['data-func'];
-            if (attr?.startsWith('sql:')) carregarDadosDebounced();
           }
         }
       });
 
+      // Carrega versão salva ou busca via API
       const htmlVersao = document.querySelector('meta[name="template-html"]')?.getAttribute('content');
       const projetoVersao = document.querySelector('meta[name="template-projeto"]')?.getAttribute('content');
 
@@ -212,7 +323,6 @@
           console.error("❌ Erro ao carregar projeto JSON:", e);
         }
       } else {
-        // Se não veio versão via meta, carrega a última versão via API
         carregarUltimaVersao();
       }
     };
