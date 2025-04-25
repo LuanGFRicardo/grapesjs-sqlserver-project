@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+use ZipArchive;
+use Illuminate\Support\Str;
 
 use App\Http\Controllers\Controller;
 use App\Models\Template;
@@ -36,6 +39,7 @@ class GrapesEditorController extends Controller
             $validated = $request->validate([
                 'nome' => 'required|string|max:255',
                 'html' => 'nullable|string',
+                'css' => 'nullable|string',
                 'projeto' => 'nullable|string',
             ]);
 
@@ -51,6 +55,7 @@ class GrapesEditorController extends Controller
             TemplateHistorico::create([
                 'template_id' => $template->id,
                 'html' => $validated['html'] ?? '',
+                'css' => $validated['css'] ?? '',
                 'projeto' => $validated['projeto'] ?? '',
             ]);
 
@@ -120,4 +125,132 @@ class GrapesEditorController extends Controller
 
     //     return response()->json(['success' => false, 'message' => 'Arquivo não encontrado.']);
     // }
+
+    // Baixar o template
+    public function baixarTemplate(Request $request) {
+        // Limpa arquivos antigos
+        $files = glob(storage_path('app/tmp/*.zip'));
+        $expiracao = now()->subMinutes(30)->timestamp;
+        foreach ($files as $file) {
+            if (filemtime($file) < $expiracao) {
+                unlink($file);
+            }
+        }
+    
+        $templateId = $request->input('template_id');
+    
+        $templateNome = Template::where('id', $templateId)
+            ->firstOrFail();
+    
+        if (!$templateNome) {
+            return response()->json(['erro' => 'Template não encontrado.'], 400);
+        }
+    
+        // Gera nome e caminho do arquivo
+        $nomeProjeto = $templateNome ?: 'template';
+        $nomeArquivo = Str::slug($nomeProjeto, '_') . '_' . now()->format('Ymd_His') . '.zip';
+        $path = storage_path("app/tmp/{$nomeArquivo}");
+    
+        // Garante que o diretório exista
+        $dirTmp = dirname($path);
+        if (!is_dir($dirTmp)) {
+            if (!mkdir($dirTmp, 0755, true)) {
+                \Log::error("Não foi possível criar o diretório: {$dirTmp}");
+                return response()->json(['erro' => 'Falha ao criar diretório temporário.'], 500);
+            }
+        }
+    
+        \Log::info("Tentando criar o arquivo ZIP: {$path}");
+    
+        try {
+            $zip = new ZipArchive;
+            $res = $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+            
+            if ($res !== TRUE) {
+                \Log::error("ZipArchive::open falhou com código: {$res}");
+                return response()->json(['erro' => 'Erro ao criar o arquivo.'], 500);
+            }
+
+            $historico = TemplateHistorico::where('template_id', $templateId)
+            ->latest('data_criacao')
+            ->first();
+
+            if (!$historico) {
+                return response()->json(['erro' => 'Histórico de template não encontrado.'], 400);
+            }
+    
+            $htmlOriginal = $historico->html ?? '';
+            $htmlHead = $this->inserirCssHead($htmlOriginal);
+
+            $cssSanitizado = html_entity_decode($historico->css ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');         
+
+            $zip->addFromString("template.blade.php", $htmlHead);
+            $zip->addFromString("style.css", $cssSanitizado);
+            $zip->close();
+        } catch (\Exception $e) {
+            \Log::error('Erro ao criar zip do template:', [
+                'erro' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['erro' => 'Erro inesperado ao gerar o zip.'], 500);
+        }        
+    
+        return response()->download($path)->deleteFileAfterSend(true);
+    }
+
+    // Insere o estilo no HTML
+    private function inserirCssHead(string $html): string
+    {
+        try {
+            $linksCss = [
+                '{{ asset(\'css/template/style.css\') }}' . '">' . PHP_EOL,
+                '{{ asset(\'vendor/googleapis/css/googleapiscss.css\') }}' . '">' . PHP_EOL,
+                '{{ asset(\'vendor/tailwindcss/css/tailwind-build.css\') }}' . '">' . PHP_EOL,
+                '{{ asset(\'vendor/tailwindcss/css/base.css\') }}' . '">' . PHP_EOL,
+                '{{ asset(\'vendor/tailwindcss/css/components.css\') }}' . '">' . PHP_EOL,
+                '{{ asset(\'vendor/tailwindcss/css/tailwind.min.css\') }}' . '">' . PHP_EOL,
+                '{{ asset(\'vendor/tailwindcss/css/utilities.css\') }}' . '">'
+            ];
+
+            $headContent = '';
+            foreach ($linksCss as $href) {
+                $headContent .= '<link rel="stylesheet" href="' . $href;
+            }
+            
+            // Verifica se há uma tag <head>
+            if (stripos($html, '<head>') !== false) {
+                return preg_replace('/<head>/i', '<head>' . PHP_EOL . $headContent, $html, 1);
+            }
+        
+            // Se não houver <head>, tenta inserir dentro de <html>
+            if (stripos($html, '<html>') !== false) {
+                return preg_replace(
+                    '/<html[^>]*>/i',
+                    '$0' . PHP_EOL . '<head>' . PHP_EOL . $headContent . PHP_EOL . '</head>',
+                    $html,
+                    1
+                );
+            }
+        
+            // Se não houver nem <html>, insere manualmente no topo
+            return '<!DOCTYPE html>' . PHP_EOL .
+                '<html>' . PHP_EOL .
+                '<head>' . PHP_EOL .
+                $headContent . PHP_EOL .
+                '</head>' . PHP_EOL .
+                '<body>' . PHP_EOL .
+                $html . PHP_EOL .
+                '</body>' . PHP_EOL .
+                '</html>';
+        } catch (\Exception $e) {
+            \Log::error('Erro:', ['erro' => $e->getMessage()]);
+            return response()->json(['error' => 'Erro.'], 500);
+        }                
+    }
+
+    // Redireciona para template exemplar
+    public function template()
+    {
+        return view('template');
+    }
 }

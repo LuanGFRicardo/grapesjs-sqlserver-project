@@ -17,17 +17,39 @@
   <link rel="stylesheet" href="{{ asset('vendor/tailwindcss/css/tailwind-build.css') }}">
   <link href="{{ asset('vendor/font-awesome/css/all.min.css') }}" rel="stylesheet" />
 
+  <!-- CodeMirror (JS e CSS) -->
+  <script src="{{ asset('vendor/codemirror/js/codemirror.min.js') }}"></script>
+  <script src="{{ asset('vendor/codemirror/js/htmlmixed.min.js') }}"></script>
+  
+  <link href="{{ asset('vendor/codemirror/css/codemirror.min.css') }}" rel="stylesheet" />
+  <link href="{{ asset('vendor/codemirror/theme/dracula.min.css') }}" rel="stylesheet" />
+
+  {{-- Beautify --}}
+  <script src="{{ asset('vendor/beautify/js/beautify-html.js' )}}"></script>
+  <script src="{{ asset('vendor/beautify/js/beautify-css.js' )}}"></script>
+  <script src="{{ asset('vendor/beautify/js/beautify.js' )}}"></script>
+  
   <style>
     html, body { margin: 0; padding: 0; height: 100%; }
     #gjs { height: 100vh; border: 3px solid #444; }
+    .CodeMirror { height: 90% }
   </style>
 </head>
 <body class="bg-gray-100 pt-[100px]">
-
   <div id="gjs"></div>
   <button onclick="salvarHistorico()">💾 Salvar</button>
   <button onclick="carregarUltimaVersao()">📂 Carregar Última Versão</button>  
   <button onclick="voltarParaMenu()">⬅️ Voltar ao Menu</button>
+  <button onclick="baixarTemplate()">⬇️ Baixar Template</button>
+
+  <button onclick="openCodeEditor()">🛠️ Editar Código</button>
+  <div id="code-editor-modal" style="display:none; position:fixed; z-index:9999; top:50px; left:50px; right:50px; bottom:50px; background:white; border:1px solid #ccc; padding:10px;">
+    <textarea id="code-editor" style="width:100%; height:80%;"></textarea>
+    <div class="text-right mt-4">
+      <button onclick="applyCodeChanges()" class="px-4 py-2 bg-blue-600 text-white rounded">Aplicar</button>
+      <button onclick="closeCodeEditor()" class="px-4 py-2 bg-gray-400 text-white rounded">Fechar</button>
+    </div>
+  </div>
 
   <!-- GrapesJS e plugins -->
   @foreach ([
@@ -56,13 +78,15 @@
 
     const salvarHistorico = () => {
       const htmlLimpo = getCleanHtml();
+      const css = editor.getCss();
 
       fetch(`${URL_BASE}/api/salvar-template`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: nomeTemplate,
-          html: htmlLimpo,
+          html: indentarHtml(htmlLimpo),
+          css: indentarCss(css),
           projeto: JSON.stringify(editor.getProjectData())
         })
       })
@@ -108,7 +132,10 @@
           `${URL_BASE}/vendor/tailwindcss/css/base.css`,
           `${URL_BASE}/vendor/tailwindcss/css/components.css`,
           `${URL_BASE}/vendor/tailwindcss/css/tailwind.min.css`,
-          `${URL_BASE}/vendor/tailwindcss/css/utilities.css`
+          `${URL_BASE}/vendor/tailwindcss/css/utilities.css`,
+          `${URL_BASE}/vendor/codemirror/js/codemirror.min.js`,
+          `${URL_BASE}/vendor/codemirror/js/htmlmixed.min.js`,
+          `${URL_BASE}/vendor/codemirror/css/codemirror.min.css`
         ].forEach(href => {
           const link = doc.createElement('link');
           link.rel = 'stylesheet';
@@ -125,6 +152,35 @@
     const voltarParaMenu = () => {
       window.location.href = '/';
     };
+
+    const baixarTemplate = () => {
+      fetch(`${URL_BASE}/api/baixar-template`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template_id:  @json($template->id) })
+      })
+      .then(async res => {
+        if (!res.ok) {
+          const erro = await res.text();
+          throw new Error(erro);
+        }
+        return res.blob();
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `template_{{ Str::slug($template->nome, '_') }}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(err => {
+        console.error("❌ Erro ao baixar o template:", err);
+        alert("❌ Falha ao baixar o template.");
+      });
+    }
 
     const getCleanHtml = () => {
       // Limpa os conteúdos dinâmicos antes de salvar
@@ -147,24 +203,12 @@
         fromElement: true,
         plugins: [
           'grapesjs-preset-webpage',
-          // 'grapesjs-preset-newsletter', 
           'grapesjs-plugin-forms',
           'grapesjs-navbar',
           'grapesjs-custom-code',
           'grapesjs-tooltip',
           'gjs-custom-blocks'
         ], 
-        // pluginsOpts: {
-        //   'grapesjs-preset-newsletter': {
-        //     blocks: ['section', 'text', 'image', 'link', 'quote', 'grid-items'],
-        //     styleManager: false,
-        //     deviceManager: false,
-        //     modal: false,
-        //     panels: false,
-        //     commands: false,
-        //     useCustomTheme: false,
-        //   }
-        // },
         assetManager: {
           // Endpoint de upload de imagem
           upload: `${URL_BASE}/api/upload-imagem`,
@@ -326,6 +370,74 @@
         carregarUltimaVersao();
       }
     };
+
+    // Indenta o HTML
+    function indentarHtml(html) {
+      const beautifiedHtml = window.html_beautify(html, {
+        indent_size: 2,
+        wrap_line_length: 120,
+        preserve_newlines: true
+      });
+
+      return beautifiedHtml;
+    }
+
+    // Indenta o CSS
+    function indentarCss(css) {
+      const beautifiedCss = window.css_beautify(css, {
+        indent_size: 2,
+        preserve_newlines: true
+      });
+      
+      return beautifiedCss;
+    }
+
+    // Code Mirror de edição de código
+    let codeMirrorEditor;
+
+    function openCodeEditor() {
+      const html = editor.getHtml();
+      const css = editor.getCss();
+
+      const beautifiedHtml = indentarHtml(html);
+
+      const beautifiedCss = indentarCss(css);
+
+      const fullCode = `<style>\n${beautifiedCss}</style>\n${beautifiedHtml}`;
+
+      document.getElementById('code-editor-modal').style.display = 'block';
+
+      if (!codeMirrorEditor) {
+        codeMirrorEditor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+          mode: "htmlmixed",
+          lineNumbers: true,
+          lineWrapping: true,
+          theme: "dracula",
+        });
+      }
+
+      codeMirrorEditor.setValue(fullCode);
+      codeMirrorEditor.refresh();
+    }
+
+    function closeCodeEditor() {
+      document.getElementById('code-editor-modal').style.display = 'none';
+    }
+
+    function applyCodeChanges() {
+      const code = codeMirrorEditor.getValue();
+
+      // Separar CSS e HTML novamente
+      const styleMatch = code.match(/<style[^>]*>([\s\S]*?)<\/style>/);
+      const html = code.replace(/<style[^>]*>[\s\S]*?<\/style>/, '').trim();
+      const css = styleMatch ? styleMatch[1] : '';
+
+      // Aplicar no editor
+      editor.setComponents(html);
+      editor.setStyle(css);
+
+      closeCodeEditor();
+    }
   </script>
 </body>
 </html>

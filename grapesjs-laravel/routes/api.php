@@ -30,6 +30,9 @@ Route::post('/upload-imagem', [GrapesEditorController::class, 'uploadImagem']);
 // Deletar imagem
 // Route::post('/deletar-imagem', [GrapesEditorController::class, 'deletarImagem']);
 
+// Baixar template
+Route::post('/baixar-template', [GrapesEditorController::class, 'baixarTemplate']);
+
 // Buscar componente específico
 Route::get('/componentes/{id}', [ComponenteController::class, 'buscarComponente']);
 

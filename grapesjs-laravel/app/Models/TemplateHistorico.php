@@ -14,6 +14,7 @@ class TemplateHistorico extends Model
     protected $fillable = [
         'template_id',
         'html',
+        'css',
         'projeto',
         'data_criacao',
         'data_modificacao',

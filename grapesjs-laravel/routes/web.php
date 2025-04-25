@@ -21,3 +21,6 @@ Route::prefix('editor')->group(function () {
 
 // Redirecionar para gerenciador de componentes
 Route::get('/componentes', [ComponenteController::class, 'index'])->name('componentes.gerenciar');
+
+// Redirecionar para template exemplar
+Route::get('/template', [GrapesEditorController::class, 'template']);

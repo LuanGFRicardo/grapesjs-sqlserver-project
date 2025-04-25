@@ -1,17 +1,33 @@
-CREATE TABLE templates (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL UNIQUE,
-    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_exclusao TIMESTAMP NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- gpsjs.SCDA01 definição
 
-CREATE TABLE template_historico (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    template_id INT NOT NULL,
-    html LONGTEXT NOT NULL,
-    projeto LONGTEXT NOT NULL,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_modificacao TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-    data_exclusao TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE `SCDA01` (
+  `Num_Registro` varchar(11) NOT NULL,
+  `Nome` varchar(78) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- gpsjs.templates definição
+
+CREATE TABLE `templates` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_exclusao` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nome` (`nome`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- gpsjs.template_historico definição
+
+CREATE TABLE `template_historico` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `template_id` int NOT NULL,
+  `html` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `css` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `projeto` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_criacao` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `data_modificacao` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `data_exclusao` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `template_id` (`template_id`),
+  CONSTRAINT `template_historico_ibfk_1` FOREIGN KEY (`template_id`) REFERENCES `templates` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
