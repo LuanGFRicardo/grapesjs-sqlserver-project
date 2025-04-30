@@ -34,7 +34,7 @@ class FileService
     // Gera um arquivo ZIP com o template e retorna o caminho do arquivo
     public function gerarTemplateZip(int $templateId): ?string
     {
-        $this->cleanOldTemporaryFiles();
+        $this->limparArquivosTemporarios();
 
         $template = Template::find($templateId);
 
@@ -72,7 +72,7 @@ class FileService
     }
 
     //  Remove arquivos ZIP antigos
-    private function cleanOldTemporaryFiles(): void
+    private function limparArquivosTemporarios(): void
     {
         $files = glob(storage_path('app/tmp/*.zip'));
         $expirationTime = now()->subMinutes(30)->timestamp;

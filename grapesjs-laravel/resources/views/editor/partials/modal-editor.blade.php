@@ -1,6 +1,7 @@
 <div 
     id="code-editor-modal" 
-    style="display:none; position:fixed; z-index:9999; top:50px; left:50px; right:50px; bottom:50px; background:white; border:1px solid #ccc; padding:10px;">
+    style="display:none; position:fixed; z-index:9999; top:50px; left:50px; right:50px;"
+    class="bg-white border border-gray-300 p-4 flex flex-col">
   <textarea id="code-editor" class="w-full h-[80%] border border-gray-300 rounded p-2"></textarea>
 
   <div class="text-right mt-4 flex justify-end gap-2">

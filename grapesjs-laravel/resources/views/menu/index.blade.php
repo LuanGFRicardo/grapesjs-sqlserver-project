@@ -3,6 +3,7 @@
 @section('title', 'Menu')
 
 @push('styles')
+    <link href="{{ asset('vendor/tailwindcss/css/tailwind-build.css') }}" rel="stylesheet"/>
     <link href="{{ asset('vendor/tailwindcss/css/tailwind.min.css') }}" rel="stylesheet"/>
 @endpush
 

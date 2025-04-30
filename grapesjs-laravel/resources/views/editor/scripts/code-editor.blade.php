@@ -5,26 +5,25 @@
     function openCodeEditor() {
       const html = editor.getHtml();
       const css = editor.getCss();
-
       const beautifiedHtml = indentarHtml(html);
-
       const beautifiedCss = indentarCss(css);
-
       const fullCode = `<style>\n${beautifiedCss}</style>\n${beautifiedHtml}`;
 
-      document.getElementById('code-editor-modal').style.display = 'block';
+      const modal = document.getElementById('code-editor-modal');
+      modal.style.display = 'block';
 
-      if (!codeMirrorEditor) {
-        codeMirrorEditor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
-          mode: "htmlmixed",
-          lineNumbers: true,
-          lineWrapping: true,
-          theme: "dracula",
-        });
-      }
-
-      codeMirrorEditor.setValue(fullCode);
-      codeMirrorEditor.refresh();
+      setTimeout(() => {
+        if (!codeMirrorEditor) {
+          codeMirrorEditor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+            mode: "htmlmixed",
+            lineNumbers: true,
+            lineWrapping: true,
+            theme: "dracula",
+          });
+        }
+        codeMirrorEditor.setValue(fullCode);
+        codeMirrorEditor.refresh();
+      }, 10);
     }
 
     function closeCodeEditor() {

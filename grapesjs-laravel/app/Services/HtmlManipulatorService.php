@@ -10,7 +10,7 @@ class HtmlManipulatorService
     // Insere links de CSS no <head> do HTML
     public function inserirCssHead(string $html): string
     {
-        $linksCss = $this->getDefaultCssLinks();
+        $linksCss = $this->pegarLinkCssPadrao();
 
         $headContent = '';
         foreach ($linksCss as $href) {
@@ -30,25 +30,22 @@ class HtmlManipulatorService
             );
         }
     
-        return $this->wrapHtmlDocument($headContent, $html);           
+        return $this->gerarDocumentoHtml($headContent, $html);           
     }
 
     // Retorna links CSS padrões
-    private function getDefaultCssLinks(): array
+    private function pegarLinkCssPadrao(): array
     {
         return [
             "{{ asset('css/template/style.css') }}",
             "{{ asset('vendor/googleapis/css/googleapiscss.css') }}",
             "{{ asset('vendor/tailwindcss/css/tailwind-build.css') }}",
-            "{{ asset('vendor/tailwindcss/css/base.css') }}",
-            "{{ asset('vendor/tailwindcss/css/components.css') }}",
-            "{{ asset('vendor/tailwindcss/css/tailwind.min.css') }}",
-            "{{ asset('vendor/tailwindcss/css/utilities.css') }}"
+            "{{ asset('vendor/tailwindcss/css/tailwind.min.css') }}"
         ];
     }
 
     // Gera um HTML completo se não houve <html> nem <head>
-    private function wrapHtmlDocument(string $headContent, string $bodyContent): string
+    private function gerarDocumentoHtml(string $headContent, string $bodyContent): string
     {
         return '<!DOCTYPE html>' . PHP_EOL .
         '<html>' . PHP_EOL .

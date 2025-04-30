@@ -72,10 +72,7 @@
         [
           `${URL_BASE}/vendor/googleapis/css/googleapiscss.css`,
           `${URL_BASE}/vendor/tailwindcss/css/tailwind-build.css`,
-          `${URL_BASE}/vendor/tailwindcss/css/base.css`,
-          `${URL_BASE}/vendor/tailwindcss/css/components.css`,
-          `${URL_BASE}/vendor/tailwindcss/css/tailwind.min.css`,
-          `${URL_BASE}/vendor/tailwindcss/css/utilities.css`
+          `${URL_BASE}/vendor/tailwindcss/css/tailwind.min.css`
         ].forEach(href => {
           const link = doc.createElement('link');
           link.rel = 'stylesheet';
