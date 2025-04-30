@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\GrapesEditorController;
 use App\Http\Controllers\ComponenteController;
 
 // Redirecionar para menu
-Route::get('/', [GrapesEditorController::class, 'menu'])->name('menu.templates');
+Route::get('/', [MenuController::class, 'index'])->name('menu.templates');
 
 // Prefixo 'editor'
 Route::prefix('editor')->group(function () {

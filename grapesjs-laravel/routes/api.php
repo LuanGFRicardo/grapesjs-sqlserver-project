@@ -27,9 +27,6 @@ Route::get('/get-template/{title}', [GrapesEditorController::class, 'carregar'])
 // Fazer upload de imagem
 Route::post('/upload-imagem', [GrapesEditorController::class, 'uploadImagem']);
 
-// Deletar imagem
-// Route::post('/deletar-imagem', [GrapesEditorController::class, 'deletarImagem']);
-
 // Baixar template
 Route::post('/baixar-template', [GrapesEditorController::class, 'baixarTemplate']);
 

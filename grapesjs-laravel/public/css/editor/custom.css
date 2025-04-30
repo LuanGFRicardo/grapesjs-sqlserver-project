@@ -1,0 +1,14 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#gjs {
+    height: 100vh;
+    border: 3px solid #444;
+}
+
+.CodeMirror {
+    height: 90%
+}

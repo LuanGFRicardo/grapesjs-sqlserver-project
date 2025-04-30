@@ -2,73 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Componente;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ComponenteService;
+use App\Models\Componente;
+use App\Enums\StatusErro;
 
 class ComponenteController extends Controller
 {
-    // Exibe a tela de gerenciamento de componentes
+
+    protected $service;
+
+    public function __construct(ComponenteService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $componentes = Componente::orderBy('nome')->get();
-        return view('components-manager', compact('componentes'));
+        try {
+            $componentes = Componente::orderBy('nome')->get();
+            return view('componentes.index', compact('componentes'));
+        } catch (\Exception $e) {
+            $this->componenteErro('Erro ao abrir gerenciador de componentes:', $e);
+        }
     }
     
-    // Retorna os dados de um componente específico
     public function buscarComponente($id)
     {
-        $componente = Componente::findOrFail($id);
-        return response()->json($componente);
+        try {
+            return response()->json(Componente::findOrFail($id));
+        } catch (\Exception $e) {
+            return $this->componenteErro('Erro ao buscar componentes:', $e);
+        }
     }
 
-    // Cria um novo componente
     public function salvarComponente(Request $request)
     {
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255|unique:componentes,nome',
-            'categoria' => 'nullable|string|max:255',
-            'html' => 'required|string',
-            'css' => 'nullable|string',
-        ]);
-
-        $validated['data_criacao'] = now();
-        $componente = Componente::create($validated);
-
-        return response()->json($componente, 201);
+        try {
+            $validated = $this->service->validar($request->all());
+            $componente = $this->service->criar($validated);
+            return response()->json($componente, 201);
+        } catch (\Exception $e) {
+            return $this->componenteErro('Erro ao salvar componente:', $e);
+        }    
     }
-
-    // Atualiza um componente existente
+    
     public function atualizarComponente(Request $request, $id)
     {
-        $componente = Componente::findOrFail($id);
-
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255|unique:componentes,nome,' . $id,
-            'categoria' => 'nullable|string|max:255',
-            'html' => 'required|string',
-            'css' => 'nullable|string',
-        ]);
-
-        $validated['data_modificacao'] = now();
-        $componente->update($validated);
-
-        return response()->json($componente);
+        try {
+            $componente = Componente::findOrFail($id);
+    
+            $validated = $this->service->validar($request->all(), $id);
+            $this->service->atualizar($componente, $validated);
+    
+            return response()->json($componente);
+        } catch (\Exception $e) {
+            return $this->componenteErro('Erro ao atualizar componente:', $e);
+        }
     }
 
-    // Marca um componente como excluído
     public function excluirComponente($id)
     {
-        $componente = Componente::findOrFail($id);
-        $componente->data_exclusao = now();
-        $componente->save();
-
-        return response()->json(['status' => 'ok']);
+        try {
+            $componente = Componente::findOrFail($id);
+            $this->service->excluir($componente);
+            return response()->json(['status' => 'ok']);
+        } catch (\Exception $e) {
+            return $this->componenteErro('Erro ao excluir componente:', $e);
+        }
     }
 
-    // Retorna todos os componentes não excluídos
     public function listarComponentes() {
-        return Componente::whereNull('data_exclusao')->get();
+        try {
+            return $this->service->listarAtivos();
+        } catch (\Exception $e) {
+            return $this->componenteErro('Erro ao listar componentes:', $e);
+        }
+    }
+
+    private function componenteErro(string $contexto, \Throwable $e): JsonResponse
+    {
+        \Log::error($contexto, [
+            'mensagem' => $e->getMessage(),
+            'arquivo' => $e->getFile(),
+            'linha' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return response()->json([
+            'error' => StatusErro::INTERNO
+        ], 500);
     }
 }
