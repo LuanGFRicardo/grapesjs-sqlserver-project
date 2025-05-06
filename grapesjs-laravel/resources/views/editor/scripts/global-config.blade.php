@@ -12,9 +12,9 @@
     }
 
     const API = {
-      salvar: `${URL_BASE}/api/salvar-template`,
-      carregar: `${URL_BASE}/api/get-template/${nomeTemplate}`,
-      baixar: `${URL_BASE}/api/baixar-template`,
+      salvar: `${URL_BASE}/api/editor/salvar-template`,
+      carregar: `${URL_BASE}/api/editor/get-template/${nomeTemplate}`,
+      baixar: `${URL_BASE}/api/editor/baixar-template`,
       dados: tipo => `${URL_BASE}/api/dados/${tipo}`
     }
 </script>

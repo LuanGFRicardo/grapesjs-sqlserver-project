@@ -8,5 +8,5 @@ Route::prefix('componentes')->group(function () {
     Route::post('/', [ComponenteController::class, 'salvarComponente']);
     Route::put('/{id}', [ComponenteController::class, 'atualizarComponente']);
     Route::delete('/{id}', [ComponenteController::class, 'excluirComponente']);
-    Route::get('/listar', [ComponenteController::class, 'listarComponentes']);
+    Route::get('/', [ComponenteController::class, 'listarComponentes']);
 });

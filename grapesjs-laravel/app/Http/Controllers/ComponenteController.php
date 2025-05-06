@@ -10,7 +10,6 @@ use App\Enums\StatusErro;
 
 class ComponenteController extends Controller
 {
-
     protected $service;
 
     public function __construct(ComponenteService $service)
@@ -73,7 +72,8 @@ class ComponenteController extends Controller
         }
     }
 
-    public function listarComponentes() {
+    public function listarComponentes() 
+    {
         try {
             return $this->service->listarAtivos();
         } catch (\Exception $e) {

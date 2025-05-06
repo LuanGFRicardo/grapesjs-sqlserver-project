@@ -23,8 +23,7 @@
         <textarea
             id="novoHtml"
             rows="4"
-            class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </textarea>
+            class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
     </div>
 
     <div>
@@ -32,8 +31,7 @@
         <textarea
             id="novoCss"
             rows="3"
-            class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </textarea>
+            class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
     </div>
 
     <div class="flex flex-wrap gap-4">

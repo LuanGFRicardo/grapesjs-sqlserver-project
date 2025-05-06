@@ -22,7 +22,6 @@
 
 @section('content')
     <div id="gjs"></div>
-    @include('editor.partials.buttons')
     @include('editor.partials.modal-editor')
 @endsection
 

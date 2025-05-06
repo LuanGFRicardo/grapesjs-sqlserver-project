@@ -7,7 +7,7 @@
       if (!nome) return alert("Digite um nome para o novo template!");
   
       try {
-        const res = await fetch(`${URL_BASE}/api/criar-template`, {
+        const res = await fetch(`${URL_BASE}/api/menu/criar-template`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,7 +39,7 @@
       }
 
       try {
-        const res = await fetch(`${URL_BASE}/api/template-historico/${encodeURIComponent(nome)}`);
+        const res = await fetch(`${URL_BASE}/api/menu/template-historico/${encodeURIComponent(nome)}`);
         const dados = await res.json();
 
         if (!Array.isArray(dados)) throw new Error("Formato inválido");
@@ -75,7 +75,7 @@
     // Abre o editor com uma versão específica
     async function editarVersao(versaoId, nomeVersao) {
       try {
-        const res = await fetch(`${URL_BASE}/api/template-versao/${versaoId}`);
+        const res = await fetch(`${URL_BASE}/api/menu/template-versao/${versaoId}`);
         if (!res.ok) throw new Error("Erro ao buscar versão");
         const data = await res.json();
 

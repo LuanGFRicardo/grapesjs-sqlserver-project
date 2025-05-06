@@ -52,7 +52,8 @@ class GrapesEditorController extends Controller
         }
     }
 
-    public function uploadImagem(Request $request) {
+    public function uploadImagem(Request $request) 
+    {
         try {
             return $this->fileService->uploadImage($request);
         } catch (\Exception $e) {

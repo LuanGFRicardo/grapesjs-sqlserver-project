@@ -4,7 +4,7 @@ grapesjs.plugins.add('gjs-custom-blocks', (editor, opts = {}) => {
 
     const carregarComponentesDinamicos = async () => {
       try {
-        const res = await fetch(`${URL_BASE}/api/listar-componentes`);
+        const res = await fetch(`${URL_BASE}/api/componentes`);
         if (!res.ok) throw new Error("Erro ao buscar componentes do banco.");
 
         const componentes = await res.json();

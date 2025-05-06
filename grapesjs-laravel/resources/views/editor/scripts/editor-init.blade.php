@@ -15,7 +15,7 @@
         ], 
         assetManager: {
           // Endpoint de upload de imagem
-          upload: `${URL_BASE}/api/upload-imagem`,
+          upload: `${URL_BASE}/api/editor/upload-imagem`,
           uploadName: 'file',
           autoAdd: true,
           multiUpload: false,
@@ -28,7 +28,7 @@
             const formData = new FormData();
             formData.append('file', files[0]);
             
-            fetch(`${URL_BASE}/api/upload-imagem`, {
+            fetch(`${URL_BASE}/api/editor/upload-imagem`, {
               method: 'POST',
               body: formData,
               headers: {
@@ -47,6 +47,73 @@
               console.error('Erro ao fazer upload de imagem: ', err);
             });
           }
+        }
+      });
+
+      // Botões
+      editor.Panels.addButton('options', {
+        id: 'salvar-template',
+        className: 'fa fa-save',
+        command: 'salvarTemplate',
+        attributes: { title: 'Salvar Template' }
+      });
+
+      editor.Panels.addButton('options', {
+        id: 'carregar-template',
+        className: 'fa fa-spinner',
+        command: 'carregarTemplate',
+        attributes: { title: 'Carregar Template' }
+      });
+
+      editor.Panels.addButton('options', {
+        id: 'editar-codigo',
+        className: 'fa fa-pencil-square-o',
+        command: 'editarCodigoTemplate',
+        attributes: { title: 'Editar Código' }
+      });
+
+      editor.Panels.addButton('options', {
+        id: 'baixar-template',
+        className: 'fa fa-download',
+        command: 'downloadTemplate',
+        attributes: { title: 'Baixar Template '}
+      });
+
+      editor.Panels.addButton('options', {
+        id: 'voltar-menu',
+        className: 'fa fa-arrow-left',
+        command: 'voltarMenu',
+        attributes: { title: 'Voltar para Menu'}
+      });
+
+      //Comandos
+      editor.Commands.add('salvarTemplate', {
+        run(editor, sender) {
+          salvarHistorico();
+        }
+      });
+
+      editor.Commands.add('carregarTemplate', {
+        run(editor, sender) {
+          carregarUltimaVersao();
+        }
+      });
+
+      editor.Commands.add('editarCodigoTemplate', {
+        run(editor, sender) {
+          openCodeEditor();
+        }
+      });
+
+      editor.Commands.add('downloadTemplate', {
+        run(editor,sender) {
+          baixarTemplate();
+        }
+      });
+
+      editor.Commands.add('voltarMenu', {
+        run(editor, sender) {
+          voltarParaMenu();
         }
       });
 
