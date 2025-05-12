@@ -21,8 +21,11 @@ class TemplateHistorico extends Model
         'data_exclusao'
     ];
 
-    public function template(): BelongsTo
-    {
-        return $this->belongsTo(Template::class, 'template_id');
-    }
+    public const COL_TEMPLATE_ID = 'template_id';
+    public const COL_HTML = 'html';
+    public const COL_CSS = 'css';
+    public const COL_PROJETO = 'projeto';
+    public const COL_CRIACAO = 'data_criacao';
+    public const COL_MODIFICACAO = 'data_modificacao';
+    public const COL_EXCLUSAO = 'data_exclusao';
 }

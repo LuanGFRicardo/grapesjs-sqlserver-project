@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\MenuService;
-use App\Enums\StatusErro;
+use App\Http\Requests\CriarTemplateRequest;
+use App\Traits\HandlesExceptions;
 
 class MenuController extends Controller
 {
+    use HandlesExceptions;
+
     protected $service;
 
     public function __construct(MenuService $service)
@@ -20,20 +22,21 @@ class MenuController extends Controller
     public function index()
     {
         try {
-            $templates = \App\Models\Template::all(['id', 'nome']);
-            return view('menu.index', compact('templates'));
+            $templates = $this->service->listarTemplates();
+            return view('filament.pages.menu.index', compact('templates'));
         } catch (\Exception $e) {
-            return $this->menuErro('Erro ao abrir menu:', $e);
+            return $this->handleException('Erro ao abrir menu:', $e);
         }   
     }
 
-    public function criarTemplate(Request $request)
+    // TODO Template já existe
+    public function criarTemplate(CriarTemplateRequest $request)
     {
         try {
-            $resposta = $this->service->criarTemplate($request->input('nome'));
+            $resposta = $this->service->criarTemplate($request->validated()['nome']);
             return response()->json($resposta);
         } catch (\Exception $e) {
-            return $this->menuErro('Erro ao criar template:', $e);
+            return $this->handleException('Erro ao criar template:', $e);
         }   
     }
 
@@ -43,7 +46,7 @@ class MenuController extends Controller
             $versoes = $this->service->historicoTemplate($nome);
             return response()->json($versoes);
         } catch(\Exception $e) {
-            return $this->menuErro('Erro ao buscar histórico:', $e);
+            return $this->handleException('Erro ao buscar histórico:', $e);
         }
     }
 
@@ -53,21 +56,7 @@ class MenuController extends Controller
             $versao = $this->service->buscarVersao($id);
             return response()->json($versao);
         } catch (\Exception $e) {
-            return $this->menuErro('Erro ao buscar versão:', $e);
+            return $this->handleException('Erro ao buscar versão:', $e);
         }
-    }
-
-    private function menuErro(string $contexto, \Throwable $e): JsonResponse
-    {
-        \Log::error($contexto, [
-            'mensagem' => $e->getMessage(),
-            'arquivo' => $e->getFile(),
-            'linha' => $e->getLine(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        return response()->json([
-            'error' => StatusErro::INTERNO
-        ], 500);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Models\Template;
 use App\Models\TemplateHistorico;
 use App\Services\HtmlManipulatorService;
@@ -12,33 +13,31 @@ class TemplateService
     public function abrirEditor(Request $request, $template)
     {
         $versaoId = $request->query('versao');
-        $templateModel = Template::where('nome', $template)->firstOrFail();
-        $versao = $versaoId
-        ? TemplateHistorico::where('id', $versaoId)->where('template_id', $templateModel->id)->firstOrFail()
-            : $templateModel->historicos()->latest('data_criacao')->first();
+        $templateModel = Template::where(Template::COL_NOME, $template)->firstOrFail();
         
-        return view('editor.index', compact('templateModel', 'versao'));
+        $versao = $versaoId
+            ? TemplateHistorico::where('id', $versaoId)
+                ->where(TemplateHistorico::COL_TEMPLATE_ID, $templateModel->id)
+                ->firstOrFail()
+            : TemplateHistorico::where(TemplateHistorico::COL_TEMPLATE_ID, $templateModel->id)
+                ->orderByDesc(TemplateHistorico::COL_CRIACAO)
+                ->firstOrFail();
+        
+        return view('filament.pages.editor.index', compact('templateModel', 'versao'));
     }
 
-    public function salvarTemplate(Request $request)
+    public function salvarTemplate(array $data): JsonResponse
     {
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255',
-            'html' => 'nullable|string',
-            'css' => 'nullable|string',
-            'projeto' => 'nullable|string',
-        ]);
-
         $template = Template::firstOrCreate(
-            ['nome' => $validated['nome']],
-            ['data_cadastro' => now()]
+            [Template::COL_NOME => $data['nome']],
+            [Template::COL_CRIACAO => now()]
         );
 
         TemplateHistorico::create([
-            'template_id' => $template->id,
-            'html' => $validated['html'] ?? '',
-            'css' => $validated['css'] ?? '',
-            'projeto' => $validated['projeto'] ?? '',
+            TemplateHistorico::COL_TEMPLATE_ID => $template->id,
+            TemplateHistorico::COL_HTML => $data['html'] ?? '',
+            TemplateHistorico::COL_CSS => $data['css'] ?? '',
+            TemplateHistorico::COL_PROJETO => $data['projeto'] ?? '',
         ]);
 
         return response()->json(['success' => true]);
@@ -46,21 +45,16 @@ class TemplateService
 
     public function carregarUltimaVersao($title)
     {
-        $template = Template::where('nome', $title)->firstOrFail();
-        $ultimoHistorico = TemplateHistorico::where('template_id', $template->id)
-            ->orderByDesc('data_criacao')
+        $template = Template::where(Template::COL_NOME, $title)->firstOrFail();
+        
+        $ultimoHistorico = TemplateHistorico::where(TemplateHistorico::COL_TEMPLATE_ID, $template->id)
+            ->orderByDesc(TemplateHistorico::COL_CRIACAO)
             ->firstOrFail();
 
         return response()->json([
-            'html' => $ultimoHistorico->html,
-            'css' => $ultimoHistorico->css,
-            'projeto' => $ultimoHistorico->projeto ?? '{}',
+            'html' => $ultimoHistorico->{TemplateHistorico::COL_HTML},
+            'css' => $ultimoHistorico->{TemplateHistorico::COL_CSS},
+            'projeto' => $ultimoHistorico->{TemplateHistorico::COL_PROJETO} ?? '{}',
         ]);
-    }
-
-    public function abrirMenu()
-    {
-        $templates = Template::all(['id', 'nome']);
-        return view('menu.index', compact('template'));
     }
 }

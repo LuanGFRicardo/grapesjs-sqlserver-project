@@ -19,8 +19,8 @@ class Componente extends Model
         'data_exclusao'
     ];
 
-    protected static function booted() 
-    {
-        static::addGlobalScope('ativo', fn($q) => $q->whereNull('data_exclusao'));
-    }
+    public const COL_NOME = 'nome';
+    public const COL_CRIACAO = 'data_criacao';
+    public const COL_MODIFICACAO = 'data_modificacao';
+    public const COL_EXCLUSAO = 'data_exclusao';
 }

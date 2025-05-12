@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use App\Models\Template;
 use App\Models\TemplateHistorico;
 
@@ -11,17 +12,17 @@ class MenuService {
     {
         $nome = trim($nome);
 
-        if (!$nome) {
+        if (empty($nome)) {
             throw new \InvalidArgumentException('Nome inválido');
         }
-
+    
         if (Template::where('nome', $nome)->exists()) {
-            throw new \RuntimeException('Template já existe');
+            throw new \RuntimeException("Template '{$nome}' já existe");
         }
 
         $template = Template::create([
-            'nome' => $nome,
-            'data_cadastro' => now(),
+            Template::COL_NOME => $nome,
+            Template::COL_CRIACAO => now(),
         ]);
 
         $htmlPadrao = '<div class="container"><h1>Novo Template Criado</h1><p>Comece aqui...</p></div>';
@@ -41,9 +42,9 @@ class MenuService {
         ], JSON_UNESCAPED_UNICODE);
 
         TemplateHistorico::create([
-            'template_id' => $template->id,
-            'html' => $htmlPadrao,
-            'projeto' => $gjsJson,
+            TemplateHistorico::COL_TEMPLATE_ID => $template->id,
+            TemplateHistorico::COL_HTML => $htmlPadrao,
+            TemplateHistorico::COL_PROJETO => $gjsJson,
         ]);
 
         return ['success' => true, 'nome' => $nome];  
@@ -51,10 +52,10 @@ class MenuService {
 
     public function historicoTemplate(string $nome)
     {
-        $template = Template::where('nome', $nome)->firstOrFail();
+        $template = Template::where(Template::COL_NOME, $nome)->firstOrFail();
 
-        return TemplateHistorico::where('template_id', $template->id)
-            ->orderByDesc('data_criacao')
+        return TemplateHistorico::where(TemplateHistorico::COL_TEMPLATE_ID, $template->id)
+            ->orderByDesc(TemplateHistorico::COL_CRIACAO)
             ->get();
     }
 
@@ -72,5 +73,10 @@ class MenuService {
         ];
 
         return $versaoJson;
+    }
+
+    public function listarTemplates(): Collection
+    {
+        return Template::select('id', Template::COL_NOME)->get();
     }
 }

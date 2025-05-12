@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\ComponenteService;
-use App\Models\Componente;
 use App\Enums\StatusErro;
+use App\Http\Requests\ComponenteRequest;
+use App\Traits\HandlesExceptions;
 
 class ComponenteController extends Controller
 {
+    use HandlesExceptions;
+
     protected $service;
 
     public function __construct(ComponenteService $service)
@@ -20,55 +23,59 @@ class ComponenteController extends Controller
     public function index()
     {
         try {
-            $componentes = Componente::orderBy('nome')->get();
-            return view('componentes.index', compact('componentes'));
+            $componentes = $this->service->listarTodos();
+            
+            return view('filament.pages.componentes.index', compact('componentes'));
         } catch (\Exception $e) {
-            $this->componenteErro('Erro ao abrir gerenciador de componentes:', $e);
+            $this->handleException('Erro ao abrir gerenciador de componentes:', $e);
         }
     }
     
     public function buscarComponente($id)
     {
         try {
-            return response()->json(Componente::findOrFail($id));
+            $componente = $this->service->buscarComponente($id);
+
+            return response()->json($componente);
         } catch (\Exception $e) {
-            return $this->componenteErro('Erro ao buscar componentes:', $e);
+            return $this->handleException('Erro ao buscar componentes:', $e);
         }
     }
 
-    public function salvarComponente(Request $request)
+    public function salvarComponente(ComponenteRequest $request)
     {
         try {
-            $validated = $this->service->validar($request->all());
+            $validated = $request->validated();
             $componente = $this->service->criar($validated);
+
             return response()->json($componente, 201);
         } catch (\Exception $e) {
-            return $this->componenteErro('Erro ao salvar componente:', $e);
+            return $this->handleException('Erro ao salvar componente:', $e);
         }    
     }
     
-    public function atualizarComponente(Request $request, $id)
+    public function atualizarComponente(ComponenteRequest $request, $id)
     {
         try {
-            $componente = Componente::findOrFail($id);
-    
-            $validated = $this->service->validar($request->all(), $id);
+            $componente = $this->service->buscarComponente($id);
+            $validated = $request->validated();
             $this->service->atualizar($componente, $validated);
-    
+
             return response()->json($componente);
         } catch (\Exception $e) {
-            return $this->componenteErro('Erro ao atualizar componente:', $e);
+            return $this->handleException('Erro ao atualizar componente:', $e);
         }
     }
 
     public function excluirComponente($id)
     {
         try {
-            $componente = Componente::findOrFail($id);
+            $componente = $this->service->buscarComponente($id);
             $this->service->excluir($componente);
+
             return response()->json(['status' => 'ok']);
         } catch (\Exception $e) {
-            return $this->componenteErro('Erro ao excluir componente:', $e);
+            return $this->handleException('Erro ao excluir componente:', $e);
         }
     }
 
@@ -77,21 +84,7 @@ class ComponenteController extends Controller
         try {
             return $this->service->listarAtivos();
         } catch (\Exception $e) {
-            return $this->componenteErro('Erro ao listar componentes:', $e);
+            return $this->handleException('Erro ao listar componentes:', $e);
         }
-    }
-
-    private function componenteErro(string $contexto, \Throwable $e): JsonResponse
-    {
-        \Log::error($contexto, [
-            'mensagem' => $e->getMessage(),
-            'arquivo' => $e->getFile(),
-            'linha' => $e->getLine(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-        
-        return response()->json([
-            'error' => StatusErro::INTERNO
-        ], 500);
     }
 }

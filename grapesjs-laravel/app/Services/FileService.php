@@ -49,7 +49,7 @@ class FileService
         $this->ensureDirectoryExists(dirname($path));
 
         $historico = TemplateHistorico::where('template_id', $templateId)
-            ->latest('data_criacao')
+            ->latest(TemplateHistorico::COL_CRIACAO)
             ->first();
 
         if (!$historico) {
