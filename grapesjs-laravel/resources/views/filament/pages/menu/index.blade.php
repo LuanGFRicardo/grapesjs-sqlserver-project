@@ -13,6 +13,10 @@
 @section('content')
     <div class="mx-auto w-full max-w-5xl space-y-8 px-4 py-10">
 
+        <h2 class="text-3xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
+            Gerenciador de Templates
+        </h2>
+
         {{-- Criar Novo Template --}}
         <section class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
             <header class="rounded-t-xl border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-5 py-3">
