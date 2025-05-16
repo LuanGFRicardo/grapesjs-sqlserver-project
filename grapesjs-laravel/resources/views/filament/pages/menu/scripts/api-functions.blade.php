@@ -51,14 +51,15 @@
 
       dados.forEach(v => {
         const li = document.createElement('li');
-        li.className = 'flex justify-between items-center bg-white border border-gray-300 rounded-md px-4 py-2 shadow-sm';
+        li.className = 'flex justify-between items-center bg-white dark:bg-gray-800 border border-gray-300 rounded-lg px-6 py-3 shadow-md transition-all';
 
         const span = document.createElement('span');
         span.textContent = new Date(v.data_criacao).toLocaleString();
-        span.className = 'text-sm text-gray-700';
+        span.className = 'text-sm dark:text-white';
 
         const btn = document.createElement('button');
-        btn.className = 'text-blue-600 hover:text-blue-800 text-sm font-medium border border-blue-300 hover:border-blue-500 rounded px-3 py-1 transition';
+        btn.className = 'bg-primary-600 text-white text-sm font-medium border border-primary-600 rounded-md px-4 py-2 transition duration-200';
+
         btn.textContent = 'Editar esta versão';
 
         btn.addEventListener('click', () => editarVersao(v.id, nome));

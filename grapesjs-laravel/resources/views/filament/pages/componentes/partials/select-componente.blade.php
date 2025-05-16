@@ -1,26 +1,39 @@
-<div class="flex flex-col md:flex-row md:items-end md:gap-6 space-y-4 md:space-y-0">
-    <div class="w-full md:w-1/3">
-        <label for="selectComponente" class="block text-sm font-medium text-gray-700 mb-1">Componente</label>
-        <select
-            id="selectComponente"
-            class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">-- Selecione --</option>
-            @foreach($componentes as $comp)
-                <option value="{{ $comp->id }}">{{ $comp->nome }}</option>
-            @endforeach
-        </select>
-    </div>
+{{-- Campo de seleção --}}
+<div class="space-y-1.5">
+    <label for="selectComponente" class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+        Componente
+    </label>
+    <select
+        id="selectComponente"
+        class="filament-forms-select block w-full rounded-md border-gray-300
+                dark:border-gray-700 dark:bg-gray-900 dark:text-white
+                shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+        <option value="">-- Selecione --</option>
+        @foreach($componentes as $comp)
+            <option value="{{ $comp->id }}">{{ $comp->nome }}</option>
+        @endforeach
+    </select>
+</div>
 
-    <div class="w-full md:w-2/3 flex justify-end gap-4">
-        <button
-            id="btnLoad"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md transition">
-                Carregar
-        </button>
-        <button
-            id="btnDelete"
-            class="border border-red-500 text-red-500 hover:bg-red-100 font-medium py-2 px-6 rounded-md transition">
-                Excluir
-        </button>
-    </div>
+{{-- Botões de ação --}}
+<div class="pt-2">
+    <button
+        id="btnLoad"
+        class="inline-flex items-center justify-center rounded-md 
+                bg-green-600 text-white 
+                px-6 py-2.5 text-sm font-semibold shadow-sm 
+                hover:bg-green-700 
+                focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
+        Carregar
+    </button>
+
+    <button
+        id="btnDelete"
+        class="inline-flex items-center justify-center rounded-md 
+                bg-red-600 text-white 
+                px-6 py-2.5 text-sm font-semibold shadow-sm 
+                hover:bg-red-700 
+                focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
+        Excluir
+    </button>
 </div>

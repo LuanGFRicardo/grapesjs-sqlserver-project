@@ -25,7 +25,9 @@ class FileService
     {
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('uploads', 'public');
-            return Storage::url($path);
+            return response()->json([
+                'url' => Storage::url($path),
+            ]);
         }
 
         return null;

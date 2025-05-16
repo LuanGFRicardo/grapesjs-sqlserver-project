@@ -29,7 +29,6 @@ class MenuController extends Controller
         }   
     }
 
-    // TODO Template já existe
     public function criarTemplate(CriarTemplateRequest $request)
     {
         try {

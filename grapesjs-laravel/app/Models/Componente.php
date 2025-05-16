@@ -12,6 +12,7 @@ class Componente extends Model
     protected $fillable = [
         'nome',
         'categoria',
+        'icone',
         'html',
         'css',
         'data_criacao',

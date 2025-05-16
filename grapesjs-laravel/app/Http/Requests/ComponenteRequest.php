@@ -26,6 +26,12 @@ class ComponenteRequest extends FormRequest
             'categoria' => 'nullable|string|max:255',
             'html' => 'required|string',
             'css' => 'nullable|string',
+            'icone' => [
+                'nullable',
+                'string',
+                'max:100',
+                'regex:/^(fa[a-z\- ]+)?$/i',
+            ],
         ];
     }
 }

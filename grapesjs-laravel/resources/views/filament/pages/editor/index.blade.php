@@ -3,21 +3,24 @@
 @section('title', 'Editor GrapesJS')
 
 @push('styles')
+    {{-- TailwindCSS (CSS) --}}
     <link href="{{ asset('vendor/tailwindcss/css/tailwind-build.css') }}" rel="stylesheet"/>
     <link href="{{ asset('vendor/tailwindcss/css/tailwind.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('css/editor/custom.css') }}" rel="stylesheet" />
-
-    {{-- GrapesJS (CSS) --}}
-    <link href="{{ asset('vendor/grapesjs/css/grapes.min.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('vendor/tailwindcss/css/tailwind-build.css') }}">
-    <link href="{{ asset('vendor/font-awesome/css/all.min.css') }}" rel="stylesheet" />
+    
+    {{-- GrapesJS (CSS) --}}
+    <link href="{{ asset('vendor/grapesjs/css/grapes.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/editor/custom.css') }}" rel="stylesheet"/>
+
+    {{-- Font Awesome --}}
+    <link href="{{ asset('vendor/font-awesome/css/all.min.css') }}" rel="stylesheet"/>
   
     {{-- CodeMirror (CSS) --}}
-    <link href="{{ asset('vendor/codemirror/css/codemirror.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('vendor/codemirror/theme/dracula.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('vendor/codemirror/css/codemirror.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('vendor/codemirror/theme/dracula.min.css') }}" rel="stylesheet"/>
     
-    {{-- Beautify (CSS) --}}
-    <script src="{{ asset('vendor/beautify/js/beautify.js' )}}"></script>
+    {{-- Beautify (JS) --}}
+    <script src="{{ asset('vendor/beautify/js/beautify.js' ) }}"></script>
 @endpush
 
 @section('content')
