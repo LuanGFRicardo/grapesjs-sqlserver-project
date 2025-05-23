@@ -24,7 +24,7 @@ class FileService
     public function uploadImagem(Request $request)
     {
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('uploads', 'public');
+            $path = $request->file('file')->store('public');
             return response()->json([
                 'url' => Storage::url($path),
             ]);

@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Template;
 use App\Models\TemplateHistorico;
 use App\Services\HtmlManipulatorService;
+use App\Models\Institucional;
 
 class TemplateService
 {
@@ -23,24 +24,130 @@ class TemplateService
                 ->orderByDesc(TemplateHistorico::COL_CRIACAO)
                 ->firstOrFail();
         
-        return view('filament.pages.editor.index', compact('templateModel', 'versao'));
+        return view('editor.index', compact('templateModel', 'versao'));
+    }
+
+    public function criarTemplate(string $nome, string $conteudoHtml): array
+    {
+        $nome = trim($nome);
+
+        if (empty($nome)) {
+            throw new \InvalidArgumentException('Nome inválido');
+        }
+    
+        if (Template::where('nome', $nome)->exists()) {
+            throw new \RuntimeException("Template '{$nome}' já existe");
+        }
+
+        $template = Template::create([
+            Template::COL_NOME => $nome,
+            Template::COL_CRIACAO => now(),
+        ]);
+
+        $htmlPadrao = '<div class="container">' . $conteudoHtml . '</div>';
+        $gjsJson = json_encode([
+            'assets' => [],
+            'styles' => [],
+            'pages' => [[
+                'name' => $nome,
+                'styles' => [],
+                'frames' => [[
+                    'component' => [
+                        'tagName' => 'div',
+                        'components' => [
+                            [
+                                'type' => 'text',
+                                'content' => $conteudoHtml,
+                            ],
+                        ],
+                    ]
+                ]],
+            ]],
+        ], JSON_UNESCAPED_UNICODE);
+
+        TemplateHistorico::create([
+            TemplateHistorico::COL_TEMPLATE_ID => $template->id,
+            TemplateHistorico::COL_HTML => $htmlPadrao,
+            TemplateHistorico::COL_PROJETO => $gjsJson,
+        ]);
+
+        return ['success' => true, 'nome' => $nome];  
     }
 
     public function salvarTemplate(array $data): JsonResponse
     {
+        // 1) Salva a nova versão histórica
+        $this->salvarVersaoTemplate(
+            $data['nome'],
+            $data['html']   ?? '',
+            $data['css']    ?? '',
+            $data['projeto']?? ''
+        );
+
+        // 2) Atualiza o campo bruto da notícia
+        //    Procuramos o registro em institucional onde o título bate com o template
+        Institucional::where('Institucional_nome', $data['nome'])
+            ->update([
+                'Institucional_texto' => $data['html'] ?? '',
+            ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function salvarVersaoTemplate(string $nome, string $html, string $css = null, string $projeto = null): void
+    {
+        $nome = trim($nome);
+        if (empty($nome)) {
+            throw new \InvalidArgumentException('Nome inválido');
+        }
+
+        // Cria ou obtém o template
         $template = Template::firstOrCreate(
-            [Template::COL_NOME => $data['nome']],
+            [Template::COL_NOME => $nome],
             [Template::COL_CRIACAO => now()]
         );
 
+        // Cria uma nova versão histórica
         TemplateHistorico::create([
             TemplateHistorico::COL_TEMPLATE_ID => $template->id,
-            TemplateHistorico::COL_HTML => $data['html'] ?? '',
-            TemplateHistorico::COL_CSS => $data['css'] ?? '',
-            TemplateHistorico::COL_PROJETO => $data['projeto'] ?? '',
+            TemplateHistorico::COL_HTML        => $html,
+            TemplateHistorico::COL_CSS         => $css        ?? '',
+            TemplateHistorico::COL_PROJETO     => $projeto    ?? '',
         ]);
 
-        return response()->json(['success' => true]);
+        // Atualiza raw da notícia
+        Institucional::where('Institucional_nome', $nome)
+            ->update(['Institucional_texto' => $html]);
+    }
+
+    public function atualizarOuCriarTemplate(string $nome, string $conteudoHtml): array
+    {
+        // Normaliza o HTML para a versão “padrão” do CRUD
+        $htmlPadrao = '<div class="container">'.$conteudoHtml.'</div>';
+
+        // JSON mínimo pro editor (pode ser estendido se você quiser extrair CSS etc)
+        $gjsJson = json_encode([
+            'assets' => [],
+            'styles' => [],
+            'pages'  => [[
+                'name'   => $nome,
+                'styles' => [],
+                'frames' => [[
+                    'component' => [
+                        'tagName'   => 'div',
+                        'components'=> [[
+                            'type'    => 'text',
+                            'content' => $conteudoHtml,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ], JSON_UNESCAPED_UNICODE);
+
+        // Reaproveita o método genérico
+        $this->salvarVersaoTemplate($nome, $htmlPadrao, '', $gjsJson);
+
+        return ['success' => true, 'nome' => $nome];
     }
 
     public function carregarUltimaVersao($title)

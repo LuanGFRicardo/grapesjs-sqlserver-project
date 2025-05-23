@@ -30,6 +30,16 @@ class GrapesEditorController extends Controller
         }        
     }    
 
+    public function criarTemplate(CriarTemplateRequest $request)
+    {
+        try {
+            $resposta = $this->templateService->criarTemplate($request->validated()['nome']);
+            return response()->json($resposta);
+        } catch (\Exception $e) {
+            return $this->handleException('Erro ao criar template:', $e);
+        }
+    }
+
     public function salvarTemplate(TemplateRequest $request)
     {
         try {

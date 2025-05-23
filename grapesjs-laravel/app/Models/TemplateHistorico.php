@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Template;
 
 class TemplateHistorico extends Model
 {
     protected $table = 'template_historico';
-
     public $timestamps = false;
 
     protected $fillable = [
@@ -28,4 +28,14 @@ class TemplateHistorico extends Model
     public const COL_CRIACAO = 'data_criacao';
     public const COL_MODIFICACAO = 'data_modificacao';
     public const COL_EXCLUSAO = 'data_exclusao';
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(Template::class, $this::COL_TEMPLATE_ID);
+    }
+
+    public function getTemplateNomeAttribute(): ?string
+    {
+        return $this->template?->nome;
+    }
 }
