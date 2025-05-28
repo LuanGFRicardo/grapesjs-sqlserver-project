@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ComponentesResource\Pages;
+use App\Filament\Resources\ComponenteResource\Pages;
 use App\Models\Componente;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,8 +11,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
+use App\Livewire\Forms\IconeSelect;
 
-class ComponentesResource extends Resource
+class ComponenteResource extends Resource
 {
     // Modelo associado à Resource
     protected static ?string $model = Componente::class;
@@ -21,6 +22,8 @@ class ComponentesResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $navigationLabel = 'Componentes';
     protected static ?string $navigationGroup = 'GrapesJS';
+    protected static ?string $modelLabel = 'Componentes';
+    protected static ?string $pluralModelLabel = 'Componentes';
     protected static ?int $navigationSort = 3;
 
     /**
@@ -34,7 +37,8 @@ class ComponentesResource extends Resource
                     ->label('Nome do Componente')
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('Informe o nome do componente'),
+                    ->placeholder('Informe o nome do componente')
+                    ->unique(ignoreRecord: true),
 
                 Forms\Components\TextInput::make('categoria')
                     ->label('Categoria')
@@ -42,12 +46,8 @@ class ComponentesResource extends Resource
                     ->maxLength(100)
                     ->placeholder('Informe a categoria'),
 
-                Forms\Components\Select::make('icone')
+                IconeSelect::make('icone')
                     ->label('Ícone')
-                    ->options(\App\Helpers\IconsSelectHelper::getIconOptions())
-                    ->searchable()
-                    ->preload()
-                    ->placeholder('Selecione um ícone')
                     ->columnSpanFull(),
 
                 Forms\Components\Textarea::make('html')
@@ -157,9 +157,9 @@ class ComponentesResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListComponentes::route('/'),
-            'create' => Pages\CreateComponentes::route('/create'),
-            'edit' => Pages\EditComponentes::route('/{record}/edit'),
+            'index' => Pages\ListComponente::route('/'),
+            'create' => Pages\CreateComponente::route('/create'),
+            'edit' => Pages\EditComponente::route('/{record}/edit'),
         ];
     }
 

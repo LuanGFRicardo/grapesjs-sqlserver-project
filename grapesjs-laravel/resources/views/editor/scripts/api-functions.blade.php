@@ -12,7 +12,13 @@
           const funcValue = container.getAttributes()['data-func'];
           const [, tipo] = funcValue.split(':');
 
-          fetch(API.dados(tipo))
+          fetch(API.dados(tipo), {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+          })
             .then(r => r.json())
             .then(data => {
               if (!Array.isArray(data)) {
@@ -42,12 +48,15 @@
 
         fetch(API.salvar, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-            nome: nomeTemplate,
-            html: indentarHtml(htmlLimpo),
-            css: indentarCss(css),
-            projeto: JSON.stringify(editor.getProjectData())
+                nome: nomeTemplate,
+                html: indentarHtml(htmlLimpo),
+                css: indentarCss(css),
+                projeto: JSON.stringify(editor.getProjectData())
             })
         })
         .then(async res => {
@@ -103,8 +112,13 @@
     const baixarTemplate = () => {
         fetch(API.baixar, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ template_id: templateId })
+            headers: { 
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+             },
+            body: JSON.stringify({ 
+                template_id: templateId
+            })
         })
         .then(async res => {
             if (!res.ok) {

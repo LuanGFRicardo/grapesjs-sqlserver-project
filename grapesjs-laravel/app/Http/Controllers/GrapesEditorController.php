@@ -30,16 +30,6 @@ class GrapesEditorController extends Controller
         }        
     }    
 
-    public function criarTemplate(CriarTemplateRequest $request)
-    {
-        try {
-            $resposta = $this->templateService->criarTemplate($request->validated()['nome']);
-            return response()->json($resposta);
-        } catch (\Exception $e) {
-            return $this->handleException('Erro ao criar template:', $e);
-        }
-    }
-
     public function salvarTemplate(TemplateRequest $request)
     {
         try {
@@ -81,10 +71,5 @@ class GrapesEditorController extends Controller
         } catch (\Exception $e) {
             return $this->handleException('Erro ao gerar arquivo ZIP:', $e);
         }    
-    }    
-
-    public function template()
-    {
-        return view('template');
     }
 }

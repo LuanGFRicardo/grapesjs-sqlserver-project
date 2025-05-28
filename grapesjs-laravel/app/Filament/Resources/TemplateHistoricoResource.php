@@ -20,8 +20,10 @@ class TemplateHistoricoResource extends Resource
 
     // Configurações de navegação
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
-    protected static ?string $navigationLabel = 'Histórico de Templates';
+    protected static ?string $navigationLabel = 'Histórico';
     protected static ?string $navigationGroup = 'GrapesJS';
+    protected static ?string $modelLabel = 'Histórico';
+    protected static ?string $pluralModelLabel = 'Histórico';
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form

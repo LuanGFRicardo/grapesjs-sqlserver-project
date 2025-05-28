@@ -20,7 +20,7 @@
         ], 
         assetManager: {
           // Endpoint de upload de imagem
-          upload: `${URL_BASE}/api/editor/upload-imagem`,
+          upload: `${URL_BASE}/editor/upload-imagem`,
           uploadName: 'file',
           autoAdd: true,
           multiUpload: false,
@@ -33,7 +33,7 @@
             const formData = new FormData();
             formData.append('file', files[0]);
             
-            fetch(`${URL_BASE}/api/editor/upload-imagem`, {
+            fetch(`${URL_BASE}/editor/upload-imagem`, {
               method: 'POST',
               body: formData,
               headers: {
