@@ -13,7 +13,7 @@
           const [, tipo] = funcValue.split(':');
 
           fetch(API.dados(tipo), {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Content-Type': 'application/json'
@@ -35,7 +35,7 @@
         });
       };
 
-      // Debounce para carregamento de dados
+      // Debounce para evitar múltiplas chamadas rápidas
       let carregarTimeout = null;
       const carregarDadosDebounced = () => {
         clearTimeout(carregarTimeout);
@@ -91,7 +91,7 @@
             const doc = editor.Canvas.getDocument();
             const head = doc.head;
 
-            // Aplica estilos ao iframe do editor
+            // Aplica CSS/JS ao iframe do editor
             [
                 `${URL_BASE}/vendor/googleapis/css/googleapiscss.css`,
                 `${URL_BASE}/vendor/tailwindcss/css/tailwind-build.css`,
@@ -131,7 +131,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `template_{{ Str::slug($templateModel->nome, '_') }}.zip`;
+            a.download = `template_{{ Str::slug($templateModel->nome, '_') }}.zip`;  // Gera ZIP do template e CSS pelo ID
             document.body.appendChild(a);
             a.click();
             a.remove();

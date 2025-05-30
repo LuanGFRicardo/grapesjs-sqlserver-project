@@ -12,6 +12,7 @@ class ListTemplates extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        // Botão para criar novo template
         return [
             Actions\CreateAction::make(),
         ];

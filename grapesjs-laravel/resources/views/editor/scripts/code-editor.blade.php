@@ -1,5 +1,5 @@
 <script>
-    // Code Mirror de edição de código
+    // Editor de código com CodeMirror
     let codeMirrorEditor;
 
     function openCodeEditor() {
@@ -26,19 +26,20 @@
       }, 10);
     }
 
+    // Fecha o modal do editor de código
     function closeCodeEditor() {
       document.getElementById('code-editor-modal').style.display = 'none';
     }
 
+    // Aplica mudanças do editor ao GrapesJS
     function applyCodeChanges() {
       const code = codeMirrorEditor.getValue();
 
-      // Separar CSS e HTML novamente
+      // Separa CSS e HTML
       const styleMatch = code.match(/<style[^>]*>([\s\S]*?)<\/style>/);
       const html = code.replace(/<style[^>]*>[\s\S]*?<\/style>/, '').trim();
       const css = styleMatch ? styleMatch[1] : '';
 
-      // Aplicar no editor
       editor.setComponents(html);
       editor.setStyle(css);
 

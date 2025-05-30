@@ -19,7 +19,7 @@
           'gjs-custom-blocks'
         ], 
         assetManager: {
-          // Endpoint de upload de imagem
+          // Endpoint upload imagem
           upload: `${URL_BASE}/editor/upload-imagem`,
           uploadName: 'file',
           autoAdd: true,
@@ -27,7 +27,7 @@
           headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
           },
-          // Como a URL será usada após upload
+          // Upload e adiciona imagem
           uploadFile: (e) => {
             const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
             const formData = new FormData();
@@ -49,13 +49,13 @@
               }
             })
             .catch(err => {
-              console.error('Erro ao fazer upload de imagem: ', err);
+              console.error('Erro upload imagem: ', err);
             });
           }
         }
       });
 
-      // Botões
+      // Botões da interface
       editor.Panels.addButton('options', {
         id: 'salvar-template',
         className: 'fa fa-save',
@@ -91,7 +91,7 @@
         attributes: { title: 'Voltar para Menu'}
       });
 
-      //Comandos
+      // Comandos do editor
       editor.Commands.add('salvarTemplate', {
         run(editor, sender) {
           salvarHistorico();
@@ -126,21 +126,22 @@
         const doc = editor.Canvas.getDocument();
         const head = doc.head;
 
-        // Adiciona metadados e título no iframe do editor
+        // Meta charset e viewport no iframe
         const metaCharset = doc.createElement('meta');
         metaCharset.setAttribute('charset', 'UTF-8');
         head.appendChild(metaCharset);
 
-        const metaViewPort = ViewPort= doc.createElement('meta');
+        const metaViewPort = doc.createElement('meta');
         metaViewPort.name = "viewport";
         metaViewPort.content = "width=device-width, initial-scale=1.0";
-        doc.head.appendChild(metaViewPort);
+        head.appendChild(metaViewPort);
 
+        // Título no iframe
         const title = doc.createElement('title');
         title.innerText = `Editor ${nomeTemplate}`;
         head.appendChild(title);
 
-        // Carrega estilos no iframe
+        // Estilos no iframe
         [
           `${URL_BASE}/vendor/googleapis/css/googleapiscss.css`,
           `${URL_BASE}/vendor/tailwindcss/css/tailwind-build.css`,
@@ -156,15 +157,16 @@
         });
       });
 
-      // Evento para componentes dinâmicos
+      // Evento para carregar dados debounce
       editor.on('load', carregarDadosDebounced);
 
+      // Recarrega dados se componente sql for adicionado
       editor.on('component:add', component => {
         const func = component.getAttributes()['data-func'];
         if (func?.startsWith('sql:')) carregarDadosDebounced();
       });
 
-      // Tipo de componente customizado
+      // Tipo customizado sql-componente
       editor.DomComponents.addType('sql-componente', {
         model: {
           defaults: {
@@ -176,7 +178,7 @@
         }
       });
 
-      // Carrega versão salva ou busca via API
+      // Carrega versão salva ou busca API
       const htmlVersao = document.querySelector('meta[name="template-html"]')?.getAttribute('content');
       const projetoVersao = document.querySelector('meta[name="template-projeto"]')?.getAttribute('content');
 
@@ -185,7 +187,7 @@
         try {
           editor.loadProjectData(JSON.parse(decodeURIComponent(projetoVersao)));
         } catch (e) {
-          console.error("❌ Erro ao carregar projeto JSON:", e);
+          console.error("❌ Erro projeto JSON:", e);
         }
       } else {
         carregarUltimaVersao();

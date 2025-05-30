@@ -1,6 +1,6 @@
 <script>
+    // Limpa conteúdo dinâmico antes de salvar
     const getCleanHtml = () => {
-        // Limpa os conteúdos dinâmicos antes de salvar
         const wrapper = editor.getWrapper();
         const sqlContainers = wrapper.find('[data-func^="sql:"]');
         
@@ -12,7 +12,7 @@
         return editor.getHtml();
     };
 
-    // Indenta o HTML
+    // Formata HTML
     function indentarHtml(html) {
         const beautifiedHtml = window.html_beautify(html, {
             indent_size: 2,
@@ -23,9 +23,9 @@
         return beautifiedHtml;
     }
 
-    // Indenta o CSS
+    // Formata CSS
     function indentarCss(css) {
-            const beautifiedCss = window.css_beautify(css, {
+        const beautifiedCss = window.css_beautify(css, {
             indent_size: 2,
             preserve_newlines: true
         });

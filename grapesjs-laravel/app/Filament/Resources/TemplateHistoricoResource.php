@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
 
 class TemplateHistoricoResource extends Resource
 {
-    // Define o model associado à resource
+    // Model associado
     protected static ?string $model = TemplateHistorico::class;
 
     // Configurações de navegação
@@ -26,35 +26,31 @@ class TemplateHistoricoResource extends Resource
     protected static ?string $pluralModelLabel = 'Histórico';
     protected static ?int $navigationSort = 2;
 
+    // Formulário de criação/edição
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                // Seleção do template relacionado
                 Forms\Components\Select::make('template_id')
                     ->label('Template')
                     ->relationship('template', 'nome')
                     ->required(),
 
-                // Campo para armazenar o HTML
                 Forms\Components\Textarea::make('html')
                     ->label('HTML')
                     ->rows(10)
                     ->columnSpanFull(),
 
-                // Campo para armazenar o CSS
                 Forms\Components\Textarea::make('css')
                     ->label('CSS')
                     ->rows(5)
                     ->columnSpanFull(),
 
-                // Campo para armazenar o projeto em JSON
                 Forms\Components\Textarea::make('projeto')
                     ->label('Projeto (JSON)')
                     ->rows(10)
                     ->columnSpanFull(),
 
-                // Data de criação registrada automaticamente
                 Forms\Components\DateTimePicker::make('data_criacao')
                     ->label('Data de Criação')
                     ->default(now())
@@ -62,25 +58,23 @@ class TemplateHistoricoResource extends Resource
             ]);
     }
 
+    // Tabela de listagem
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                // Exibe o nome do template relacionado
                 Tables\Columns\TextColumn::make('template.nome')
                     ->label('Template')
                     ->sortable()
                     ->searchable()
                     ->limit(30),
 
-                // Exibe a data de criação formatada
                 Tables\Columns\TextColumn::make('data_criacao')
                     ->label('Data de Criação')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
             ->actions([
-                // Ação customizada para editar no editor GrapesJS
                 Action::make('editarComGrapesjs')
                     ->label('Editar com GrapesJS')
                     ->icon('heroicon-o-pencil-square')
@@ -90,7 +84,7 @@ class TemplateHistoricoResource extends Resource
                             ? route('editor.template', [
                                 'template' => $record->template_nome,
                                 '?versao=' . $record->id
-                                ])
+                              ])
                             : '#'
                     )
                     ->openUrlInNewTab()
@@ -102,13 +96,13 @@ class TemplateHistoricoResource extends Resource
             ->paginationPageOptions([10, 25, 50, 100, 250]);
     }
 
+    // Sem relacionamentos adicionais
     public static function getRelations(): array
     {
-        return [
-            // Sem relacionamentos adicionais
-        ];
+        return [];
     }
 
+    // Rotas das páginas
     public static function getPages(): array
     {
         return [
@@ -116,9 +110,9 @@ class TemplateHistoricoResource extends Resource
         ];
     }
 
+    // Query padrão
     public static function getEloquentQuery(): Builder
     {
-        // Mantém a query padrão sem alterações
         return parent::getEloquentQuery();
     }
 }

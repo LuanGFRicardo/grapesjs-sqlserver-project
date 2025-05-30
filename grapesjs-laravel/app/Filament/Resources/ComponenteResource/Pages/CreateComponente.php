@@ -10,11 +10,13 @@ class CreateComponente extends CreateRecord
 {
     protected static string $resource = ComponenteResource::class;
 
+    // Redireciona para a lista após criação
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl();
     }
 
+    // Define ações do formulário (criar e cancelar)
     protected function getFormActions(): array
     {
         return [
@@ -23,6 +25,7 @@ class CreateComponente extends CreateRecord
         ];
     }
 
+    // Ajusta dados do formulário antes de criar
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['icone'] = $this->form->getState()['icone'];

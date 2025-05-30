@@ -14,20 +14,20 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TemplateResource extends Resource
 {
-    // Model associado a esta Resource
+    // Model associado
     protected static ?string $model = Template::class;
 
-    // Configurações de navegação no painel
+    // Configurações de navegação
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Templates';
     protected static ?string $navigationGroup = 'GrapesJS';
     protected static ?int $navigationSort = 1;
 
+    // Formulário de criação/edição
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                // Campo obrigatório para nome do template
                 Forms\Components\TextInput::make('nome')
                     ->label('Nome do Template')
                     ->required()
@@ -37,6 +37,7 @@ class TemplateResource extends Resource
             ]);
     }
 
+    // Tabela de listagem
     public static function table(Table $table): Table
     {
         return $table
@@ -58,7 +59,6 @@ class TemplateResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                // Indicação visual de status com cores
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->getStateUsing(fn ($record) => $record->data_exclusao ? 'Excluído' : 'Ativo')
@@ -68,7 +68,6 @@ class TemplateResource extends Resource
                     ]),
             ])
             ->filters([
-                // Filtro de status baseado na data de exclusão
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status')
                     ->options([
@@ -87,20 +86,19 @@ class TemplateResource extends Resource
                     }),
             ])
             ->actions([
-                // Ação para abrir no editor GrapesJS
                 Action::make('editarComGrapesjs')
                     ->label('Editar Template')
                     ->icon('heroicon-o-pencil-square')
-                    ->url(fn ($record) => $record ? route('editor.template', ['template' => $record->nome]) : '#')
+                    ->url(fn ($record) => 
+                        $record ? route('editor.template', ['template' => $record->nome]) : '#'
+                    )
                     ->openUrlInNewTab()
                     ->color('success')
                     ->visible(fn ($record) => filled($record->nome)),
 
-                // Ação padrão de edição
                 Tables\Actions\EditAction::make(),
 
-                // Ação de soft delete com confirmação
-                Tables\Actions\Action::make('marcarComoExcluido')
+                Action::make('marcarComoExcluido')
                     ->label('Excluir')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
@@ -116,13 +114,13 @@ class TemplateResource extends Resource
             ->paginationPageOptions([10, 25, 50, 100, 250]);
     }
 
+    // Sem relações adicionais
     public static function getRelations(): array
     {
-        return [
-            // Sem relações definidas no momento
-        ];
+        return [];
     }
 
+    // Rotas das páginas
     public static function getPages(): array
     {
         return [
@@ -132,9 +130,9 @@ class TemplateResource extends Resource
         ];
     }
 
+    // Query padrão
     public static function getEloquentQuery(): Builder
     {
-        // Mantém a query padrão; considerar ajuste para integração total com filtro de soft delete
         return parent::getEloquentQuery();
     }
 }

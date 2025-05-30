@@ -7,20 +7,25 @@ use Exception;
 
 class HtmlManipulatorService 
 {
-    // Insere links de CSS no <head> do HTML
+    // Insere links CSS no <head> do HTML.
+    // Se não existir <head>, cria dentro de <html> ou gera documento completo.
     public function inserirCssHead(string $html): string
     {
+        // Pega links CSS padrão
         $linksCss = $this->pegarLinkCssPadrao();
 
+        // Monta conteúdo do <head> com links CSS
         $headContent = '';
         foreach ($linksCss as $href) {
             $headContent .= '<link rel="stylesheet" href="' . $href . '">' . PHP_EOL;
         }
         
+        // Se existe <head>, insere links nele
         if (stripos($html, '<head>') !== false) {
             return preg_replace('/<head>/i', '<head>' . PHP_EOL . $headContent, $html, 1);
         }
     
+        // Se existe só <html>, cria <head> com links
         if (stripos($html, '<html>') !== false) {
             return preg_replace(
                 '/<html[^>]*>/i',
@@ -30,10 +35,11 @@ class HtmlManipulatorService
             );
         }
     
+        // Se não existe <html> nem <head>, gera documento HTML completo
         return $this->gerarDocumentoHtml($headContent, $html);           
     }
 
-    // Retorna links CSS padrões
+    // Retorna array com links CSS padrão.
     private function pegarLinkCssPadrao(): array
     {
         return [
@@ -44,7 +50,7 @@ class HtmlManipulatorService
         ];
     }
 
-    // Gera um HTML completo se não houve <html> nem <head>
+    // Gera documento HTML completo com <head> e <body>.
     private function gerarDocumentoHtml(string $headContent, string $bodyContent): string
     {
         return '<!DOCTYPE html>' . PHP_EOL .

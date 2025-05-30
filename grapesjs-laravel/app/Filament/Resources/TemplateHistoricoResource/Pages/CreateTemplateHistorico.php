@@ -8,5 +8,6 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateTemplateHistorico extends CreateRecord
 {
+    // Define o resource associado
     protected static string $resource = TemplateHistoricoResource::class;
 }

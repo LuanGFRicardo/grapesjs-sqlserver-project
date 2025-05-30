@@ -10,6 +10,7 @@ class ListComponente extends ListRecords
 {
     protected static string $resource = ComponenteResource::class;
 
+    // Botão para criar novo componente
     protected function getHeaderActions(): array
     {
         return [

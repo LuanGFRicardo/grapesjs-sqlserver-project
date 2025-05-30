@@ -15,34 +15,29 @@ class FileService
 {
     protected HtmlManipulatorService $htmlManipulatorService;
 
+    // Construtor recebe o serviço de manipulação de HTML.
     public function __construct(HtmlManipulatorService $htmlManipulatorService)
     {
         $this->htmlManipulatorService = $htmlManipulatorService;
     }
 
-    // Faz upload de imagem e retorna o caminho salvo
+    // Faz upload da imagem e retorna URL.
     public function uploadImagem(Request $request)
     {
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('public');
-            return response()->json([
-                'url' => Storage::url($path),
-            ]);
+            return response()->json(['url' => Storage::url($path)]);
         }
-
         return null;
     }
 
-    // Gera um arquivo ZIP com o template e retorna o caminho do arquivo
+    // Gera ZIP do template e CSS pelo ID.
     public function gerarTemplateZip(int $templateId): ?string
     {
         $this->limparArquivosTemporarios();
 
         $template = Template::find($templateId);
-
-        if (!$template) {
-            throw new Exception('Template não encontrado.');
-        }
+        if (!$template) throw new Exception('Template não encontrado.');
 
         $nomeProjeto = $template->nome ?? 'template';
         $nomeArquivo = Str::slug($nomeProjeto, '_') . '_' . now()->format('Ymd_His') . '.zip';
@@ -54,9 +49,7 @@ class FileService
             ->latest(TemplateHistorico::COL_CRIACAO)
             ->first();
 
-        if (!$historico) {
-            throw new Exception('Histórico de template não encontrado');
-        }
+        if (!$historico) throw new Exception('Histórico de template não encontrado');
 
         $htmlComCss = $this->htmlManipulatorService->inserirCssHead($historico->html ?? '');
         $cssSanitizado = html_entity_decode($historico->css ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -73,7 +66,7 @@ class FileService
         return $path;
     }
 
-    //  Remove arquivos ZIP antigos
+    // Remove ZIPs temporários com mais de 30 minutos.
     private function limparArquivosTemporarios(): void
     {
         $files = glob(storage_path('app/tmp/*.zip'));
@@ -86,13 +79,11 @@ class FileService
         }
     }
 
-    // Garante que o diretório existe
+    // Cria diretório caso não exista.
     private function ensureDirectoryExists(string $path): void
     {
-        if (!is_dir($path)) {
-            if (!mkdir($path, 0755, true) && !id_dir($path)) {
-                throw new Exception("Falha ao criar diretório: {$path}");
-            }
+        if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
+            throw new Exception("Falha ao criar diretório: {$path}");
         }
     }
 }

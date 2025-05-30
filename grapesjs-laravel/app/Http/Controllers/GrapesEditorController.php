@@ -21,6 +21,7 @@ class GrapesEditorController extends Controller
         private FileService $fileService
     ) {}
 
+    // Abre o editor para o template
     public function index(Request $request, $template)
     {
         try {
@@ -30,6 +31,7 @@ class GrapesEditorController extends Controller
         }        
     }    
 
+    // Salva o template validado
     public function salvarTemplate(TemplateRequest $request)
     {
         try {
@@ -40,6 +42,7 @@ class GrapesEditorController extends Controller
         }        
     }
 
+    // Carrega a última versão do template
     public function carregarUltimaVersao($title)
     {
         try {
@@ -49,6 +52,7 @@ class GrapesEditorController extends Controller
         }
     }
 
+    // Faz upload de imagem
     public function uploadImagem(Request $request) 
     {
         try {
@@ -58,6 +62,7 @@ class GrapesEditorController extends Controller
         }
     }
 
+    // Baixa o template em arquivo ZIP
     public function baixarTemplate(BaixarTemplateRequest $request)
     {
         try {

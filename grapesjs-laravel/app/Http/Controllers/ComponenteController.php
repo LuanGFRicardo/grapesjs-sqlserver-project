@@ -19,6 +19,7 @@ class ComponenteController extends Controller
         $this->service = $service;
     }
 
+    // Retorna componentes ativos ou trata erro
     public function listarComponentes() 
     {
         try {

@@ -8,8 +8,10 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditTemplateHistorico extends EditRecord
 {
+    // Resource associado
     protected static string $resource = TemplateHistoricoResource::class;
 
+    // Ação de excluir no cabeçalho
     protected function getHeaderActions(): array
     {
         return [

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class ConsultaDadosController extends Controller
 {
-    // Retorna dados com base no tipo
+    // Retorna dados conforme tipo ou erro
     public function obter($tipo)
     {
         try {
@@ -25,7 +25,7 @@ class ConsultaDadosController extends Controller
         }
     }
 
-    // Executa a consulta correspondente ao tipo fornecido
+    // Consulta dados segundo o tipo
     private function buscarDadosPorTipo(string $tipo)
     {
         return match ($tipo) {

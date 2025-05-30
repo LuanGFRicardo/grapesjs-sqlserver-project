@@ -15,10 +15,10 @@ use App\Livewire\Forms\IconeSelect;
 
 class ComponenteResource extends Resource
 {
-    // Modelo associado à Resource
+    // Modelo associado
     protected static ?string $model = Componente::class;
 
-    // Configurações de navegação no painel
+    // Configurações de navegação
     protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $navigationLabel = 'Componentes';
     protected static ?string $navigationGroup = 'GrapesJS';
@@ -26,45 +26,40 @@ class ComponenteResource extends Resource
     protected static ?string $pluralModelLabel = 'Componentes';
     protected static ?int $navigationSort = 3;
 
-    /**
-     * Define o formulário de criação e edição.
-     */
+    // Formulário de criação/edição
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('nome')
-                    ->label('Nome do Componente')
-                    ->required()
-                    ->maxLength(255)
-                    ->placeholder('Informe o nome do componente')
-                    ->unique(ignoreRecord: true),
+        return $form->schema([
+            Forms\Components\TextInput::make('nome')
+                ->label('Nome do Componente')
+                ->required()
+                ->maxLength(255)
+                ->placeholder('Informe o nome do componente')
+                ->unique(ignoreRecord: true),
 
-                Forms\Components\TextInput::make('categoria')
-                    ->label('Categoria')
-                    ->required()
-                    ->maxLength(100)
-                    ->placeholder('Informe a categoria'),
+            Forms\Components\TextInput::make('categoria')
+                ->label('Categoria')
+                ->required()
+                ->maxLength(100)
+                ->placeholder('Informe a categoria'),
 
-                IconeSelect::make('icone')
-                    ->label('Ícone')
-                    ->columnSpanFull(),
+            IconeSelect::make('icone')
+                ->label('Ícone')
+                ->columnSpanFull(),
 
-                Forms\Components\Textarea::make('html')
-                    ->label('HTML')
-                    ->rows(10)
-                    ->columnSpanFull(),
+            Forms\Components\Textarea::make('html')
+                ->label('HTML')
+                ->rows(10)
+                ->columnSpanFull(),
 
-                Forms\Components\Textarea::make('css')
-                    ->label('CSS')
-                    ->rows(5)
-                    ->columnSpanFull(),
-            ]);
+            Forms\Components\Textarea::make('css')
+                ->label('CSS')
+                ->rows(5)
+                ->columnSpanFull(),
+        ]);
     }
 
-    /**
-     * Configura a tabela de listagem e suas ações.
-     */
+    // Tabela de listagem e ações
     public static function table(Table $table): Table
     {
         return $table
@@ -126,34 +121,27 @@ class ComponenteResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
 
-                // Ação personalizada: marca como excluído logicamente
                 Action::make('marcarComoExcluido')
                     ->label('Excluir')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->action(function ($record) {
-                        $record->update(['data_exclusao' => now()]);
-                    })
+                    ->action(fn ($record) => $record->update(['data_exclusao' => now()]))
                     ->visible(fn ($record) => $record && is_null($record->data_exclusao)),
             ])
-            ->bulkActions([]) // Nenhuma ação em lote configurada
-            ->selectable(false) // Desativa seleção múltipla
+            ->bulkActions([]) // Sem ações em lote
+            ->selectable(false) // Sem seleção múltipla
             ->defaultSort('data_criacao', 'desc') // Ordenação padrão
-            ->paginationPageOptions([10, 25, 50, 100, 250]); // Limita exibição até 250
+            ->paginationPageOptions([10, 25, 50, 100, 250]);
     }
 
-    /**
-     * Define relações adicionais se necessário (nenhuma atualmente).
-     */
+    // Relações (nenhuma no momento)
     public static function getRelations(): array
     {
         return [];
     }
 
-    /**
-     * Define as rotas das páginas relacionadas à Resource.
-     */
+    // Rotas das páginas da Resource
     public static function getPages(): array
     {
         return [
@@ -163,9 +151,7 @@ class ComponenteResource extends Resource
         ];
     }
 
-    /**
-     * Define a query padrão utilizada pela Resource.
-     */
+    // Query Eloquent padrão (sem alterações)
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery();
