@@ -32,8 +32,7 @@ class TemplateResource extends Resource
                     ->label('Nome do Template')
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('Informe o nome do template')
-                    ->unique(ignoreRecord: true),
+                    ->placeholder('Informe o nome do template'),
             ]);
     }
 

@@ -108,8 +108,14 @@ class TemplateService
     // Converte HTML em componentes GrapesJS
     public function htmlToGrapesComponents(string $conteudoHtml): array
     {
-        $dom = new \DOMDocument();
-        @$dom->loadHTML('<div>' . $conteudoHtml . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $conteudoHtmlUtf8 = mb_convert_encoding($conteudoHtml, 'HTML-ENTITIES', 'UTF-8');
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        libxml_use_internal_errors(true);
+
+        @$dom->loadHTML('<div>' . $conteudoHtmlUtf8 . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        libxml_clear_errors();
 
         $body = $dom->getElementsByTagName('div')->item(0);
 
