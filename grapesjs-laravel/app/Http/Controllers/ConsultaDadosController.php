@@ -29,7 +29,7 @@ class ConsultaDadosController extends Controller
     private function buscarDadosPorTipo(string $tipo)
     {
         return match ($tipo) {
-            'registro', 'lista-registros' => DB::table('SCDA01')->select('Num_Registro')->get(),
+            'noticia' => DB::table('noticias')->select('nome as valor')->get(),
             default => null,
         };
     }

@@ -14,5 +14,9 @@ Livewire::setUpdateRoute(function ($handle) {
 Route::middleware(['auth'])->group(function () {
     require __DIR__.'/web/editor.php'; // Inclui rotas do editor
     require __DIR__.'/web/componente.php'; // Inclui rotas de componentes
-    require __DIR__.'/web/dados.php'; // Inclui rotas de dados
 });
+
+require __DIR__.'/web/dados.php'; // Inclui rotas públicas de dados dinâmicos para o editor e notícias
+
+Route::get('/noticias', [App\Http\Controllers\NoticiaController::class, 'index'])->name('noticias.index');
+Route::get('/noticias/{id}', [App\Http\Controllers\NoticiaController::class, 'show'])->name('noticias.show');

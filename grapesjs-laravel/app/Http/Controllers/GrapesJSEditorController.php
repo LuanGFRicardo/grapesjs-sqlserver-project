@@ -7,17 +7,18 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Http\JsonResponse;
 use App\Services\TemplateService;
 use App\Services\FileService;
-use App\Enums\StatusErro;
 use App\Http\Requests\TemplateRequest;
 use App\Http\Requests\BaixarTemplateRequest;
 use App\Traits\HandlesExceptions;
+use App\Services\GrapesJSEditorService;
 
-class GrapesEditorController extends Controller
+class GrapesJSEditorController extends Controller
 {
     use HandlesExceptions;
 
     public function __construct(
         private TemplateService $templateService,
+        private GrapesJSEditorService $grapesJSEditorService,
         private FileService $fileService
     ) {}
 
@@ -25,7 +26,7 @@ class GrapesEditorController extends Controller
     public function index(Request $request, $template)
     {
         try {
-            return $this->templateService->abrirEditor($request, $template);
+            return $this->grapesJSEditorService->abrirEditor($request, $template);
         } catch (\Exception $e) {
             return $this->handleException('Erro ao abrir editor:', $e);
         }        
@@ -36,17 +37,17 @@ class GrapesEditorController extends Controller
     {
         try {
             $template = $request->validated();
-            return $this->templateService->salvarTemplate($template);
+            return $this->grapesJSEditorService->salvarTemplate($template);
         } catch (\Exception $e) {
             return $this->handleException('Erro ao salvar template:', $e);
         }        
     }
 
     // Carrega a última versão do template
-    public function carregarUltimaVersao($title)
+    public function carregarUltimaVersao($templateId)
     {
         try {
-            return $this->templateService->carregarUltimaVersao($title);
+            return $this->grapesJSEditorService->carregarUltimaVersao($templateId);
         } catch (\Exception $e) {
             return $this->handleException('Erro ao carregar última versão do template:', $e);
         }

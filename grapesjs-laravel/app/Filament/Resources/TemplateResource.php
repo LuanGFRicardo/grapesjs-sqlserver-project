@@ -88,9 +88,18 @@ class TemplateResource extends Resource
                 Action::make('editarComGrapesjs')
                     ->label('Editar Template')
                     ->icon('heroicon-o-pencil-square')
-                    ->url(fn ($record) => 
-                        $record ? route('editor.template', ['template' => $record->nome]) : '#'
-                    )
+                    ->url(function ($record) {
+                        $ultimaVersao = $record->historicos()
+                            ->orderByDesc('data_criacao')
+                            ->first();
+
+                        return $ultimaVersao
+                            ? route('editor.template', [
+                                'template' => $record->id,
+                                'versao' => $ultimaVersao->id,
+                            ])
+                            : '#';
+                    })
                     ->openUrlInNewTab()
                     ->color('success')
                     ->visible(fn ($record) => filled($record->nome)),
@@ -127,11 +136,5 @@ class TemplateResource extends Resource
             'create' => Pages\CreateTemplate::route('/create'),
             'edit' => Pages\EditTemplate::route('/{record}/edit'),
         ];
-    }
-
-    // Query padrão
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
     }
 }

@@ -3,13 +3,12 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
-use App\Enums\StatusErro;
 use Throwable;
 use Log;
 
 trait HandlesExceptions
 {
-    // Manipula exceções, registra no log e retorna JSON padrão.
+    // Manipula exceções, registra no log e retorna JSON padrão
     public function handleException(string $contexto, \Throwable $e): JsonResponse
     {
         // Registra detalhes da exceção no log
@@ -22,7 +21,7 @@ trait HandlesExceptions
 
         // Retorna JSON padrão com erro interno
         return response()->json([
-            'error' => StatusErro::INTERNO
+            'error' => 'Erro interno ao processar a chamada.'
         ], 500);
     }
 }

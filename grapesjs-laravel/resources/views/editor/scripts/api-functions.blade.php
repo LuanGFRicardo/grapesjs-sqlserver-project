@@ -9,38 +9,38 @@
         const sqlContainers = wrapper.find('[data-func^="sql:"]');
 
         sqlContainers.forEach(container => {
-          const funcValue = container.getAttributes()['data-func'];
-          const [, tipo] = funcValue.split(':');
+            const funcValue = container.getAttributes()['data-func'];
+            const [, tipo] = funcValue.split(':');
 
-          fetch(API.dados(tipo), {
+            fetch(API.dados(tipo), {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'Content-Type': 'application/json'
             }
-          })
+            })
             .then(r => r.json())
             .then(data => {
-              if (!Array.isArray(data)) {
-                console.error("❌ Dados inválidos:", data);
-                return;
-              }
+                if (!Array.isArray(data)) {
+                    console.error("❌ Dados inválidos:", data);
+                    return;
+                }
 
-              let html = "";
-              data.forEach(item => html += `${item.Num_Registro}`);
+                let html = "";
+                data.forEach(item => html += `<p>${item.valor}</p>`);
 
-              container.components(html);
+                container.components(html);
             })
             .catch(err => handleApiError("Carregar dados do template", err));
         });
-      };
+    };
 
-      // Debounce para evitar múltiplas chamadas rápidas
-      let carregarTimeout = null;
-      const carregarDadosDebounced = () => {
+    // Debounce para evitar múltiplas chamadas rápidas
+    let carregarTimeout = null;
+    const carregarDadosDebounced = () => {
         clearTimeout(carregarTimeout);
         carregarTimeout = setTimeout(carregarDados, 100);
-      };
+    };
 
     const salvarHistorico = () => {
         const htmlLimpo = getCleanHtml();
@@ -53,7 +53,7 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                nome: nomeTemplate,
+                template_id: window.ID_TEMPLATE,
                 html: indentarHtml(htmlLimpo),
                 css: indentarCss(css),
                 projeto: JSON.stringify(editor.getProjectData())
@@ -117,7 +117,7 @@
                 'Content-Type': 'application/json'
              },
             body: JSON.stringify({ 
-                template_id: templateId
+                template_id: window.ID_TEMPLATE
             })
         })
         .then(async res => {

@@ -6,7 +6,7 @@ use App\Models\Componente;
 
 class ComponenteService
 {
-    // Retorna componentes ativos (sem exclusão lógica).
+    // Retorna componentes ativos
     public function listarAtivos()
     {
         // Busca componentes sem data de exclusão

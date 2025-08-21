@@ -15,23 +15,23 @@ class FileService
 {
     protected HtmlManipulatorService $htmlManipulatorService;
 
-    // Construtor recebe o serviço de manipulação de HTML.
+    // Construtor recebe o serviço de manipulação de HTML
     public function __construct(HtmlManipulatorService $htmlManipulatorService)
     {
         $this->htmlManipulatorService = $htmlManipulatorService;
     }
 
-    // Faz upload da imagem e retorna URL.
+    // Faz upload da imagem e retorna URL
     public function uploadImagem(Request $request)
     {
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('public');
+            $path = $request->file('file')->store('', 'public');
             return response()->json(['url' => Storage::url($path)]);
         }
         return null;
     }
 
-    // Gera ZIP do template e CSS pelo ID.
+    // Gera ZIP do template e CSS pelo ID
     public function gerarTemplateZip(int $templateId): ?string
     {
         $this->limparArquivosTemporarios();
@@ -66,7 +66,7 @@ class FileService
         return $path;
     }
 
-    // Remove ZIPs temporários com mais de 30 minutos.
+    // Remove ZIPs temporários com mais de 30 minutos
     private function limparArquivosTemporarios(): void
     {
         $files = glob(storage_path('app/tmp/*.zip'));
@@ -79,7 +79,7 @@ class FileService
         }
     }
 
-    // Cria diretório caso não exista.
+    // Cria diretório caso não exista
     private function ensureDirectoryExists(string $path): void
     {
         if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {

@@ -10,7 +10,7 @@ class CreateComponente extends CreateRecord
 {
     protected static string $resource = ComponenteResource::class;
 
-    // Redireciona para a lista após criação
+    // Redireciona para a listagem após criação
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl();

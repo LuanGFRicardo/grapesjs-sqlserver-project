@@ -7,8 +7,8 @@ use Exception;
 
 class HtmlManipulatorService 
 {
-    // Insere links CSS no <head> do HTML.
-    // Se não existir <head>, cria dentro de <html> ou gera documento completo.
+    // Insere links CSS no <head> do HTML
+    // Se não existir <head>, cria dentro de <html> ou gera documento completo
     public function inserirCssHead(string $html): string
     {
         // Pega links CSS padrão
@@ -39,7 +39,7 @@ class HtmlManipulatorService
         return $this->gerarDocumentoHtml($headContent, $html);           
     }
 
-    // Retorna array com links CSS padrão.
+    // Retorna array com links CSS padrão
     private function pegarLinkCssPadrao(): array
     {
         return [
@@ -50,7 +50,7 @@ class HtmlManipulatorService
         ];
     }
 
-    // Gera documento HTML completo com <head> e <body>.
+    // Gera documento HTML completo com <head> e <body>
     private function gerarDocumentoHtml(string $headContent, string $bodyContent): string
     {
         return '<!DOCTYPE html>' . PHP_EOL .

@@ -25,4 +25,9 @@ class Template extends Model
     public const COL_CRIACAO = 'data_criacao';
     public const COL_MODIFICACAO = 'data_modificacao';
     public const COL_EXCLUSAO = 'data_exclusao';
+
+    public function historicos(): HasMany
+    {
+        return $this->hasMany(TemplateHistorico::class, TemplateHistorico::COL_TEMPLATE_ID);
+    }
 }

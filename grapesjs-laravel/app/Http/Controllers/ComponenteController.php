@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\ComponenteService;
-use App\Enums\StatusErro;
 use App\Traits\HandlesExceptions;
 
 class ComponenteController extends Controller

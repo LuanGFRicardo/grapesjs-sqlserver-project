@@ -10,15 +10,7 @@ class EditComponente extends EditRecord
 {
     protected static string $resource = ComponenteResource::class;
 
-    // Ação de deletar no cabeçalho
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\DeleteAction::make(),
-        ];
-    }
-
-    // Redireciona para a lista após salvar
+    // Redireciona para a listagem após salvar
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl();

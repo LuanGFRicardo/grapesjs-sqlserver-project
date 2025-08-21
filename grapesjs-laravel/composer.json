@@ -50,11 +50,17 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
-            "@php artisan migrate --graceful --ansi"
+            "@php artisan migrate --graceful --ansi",
+            "@composer run setup"
+        ],
+        "setup": [
+            "@php artisan storage:link",
+            "npm install",
+            "npm run build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --port=8081\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --port=8082\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'",
             "npm run build:tailwind"
         ]
     },

@@ -4,23 +4,16 @@
         window.URL_BASE = "{{ rtrim(env('URL_BASE', url('/')), '/') }}";
     }
 
-    // ID do template
-    const templateId = document.querySelector('meta[name="template-id"]')?.content;
+    // ID e NOME do template via meta tag
+    window.ID_TEMPLATE = document.querySelector('meta[name="template-id"]')?.content;
+
+    window.NOME_TEMPLATE = document.querySelector('meta[name="template-name"]')?.content;
     
-    // Nome do template
-    const metaTemplate = document.querySelector('meta[name="template-name"]');
-    const nomeTemplate = metaTemplate ? metaTemplate.getAttribute('content') : null;
-
-    // Alerta se nome não informado
-    if (!nomeTemplate) {
-      alert('❌ Template não informado!');
-    }
-
     // Endpoints API
     const API = {
-      salvar: `${URL_BASE}/editor/salvar-template`,
-      carregar: `${URL_BASE}/editor/get-template/${nomeTemplate}`,
-      baixar: `${URL_BASE}/editor/baixar-template`,
-      dados: tipo => `${URL_BASE}/dados/${tipo}`
+        salvar: `${URL_BASE}/editor/salvar-template`,
+        carregar: `${URL_BASE}/editor/get-template/${window.ID_TEMPLATE}`,
+        baixar: `${URL_BASE}/editor/baixar-template`,
+        dados: tipo => `${URL_BASE}/dados/${tipo}`
     }
 </script>

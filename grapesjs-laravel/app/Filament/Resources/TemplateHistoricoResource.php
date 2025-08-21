@@ -79,17 +79,17 @@ class TemplateHistoricoResource extends Resource
                     ->label('Editar com GrapesJS')
                     ->icon('heroicon-o-pencil-square')
                     ->color('success')
-                    ->url(fn ($record) => 
-                        $record && $record->template
+                    ->url(fn ($record) =>
+                        $record && $record->template_id
                             ? route('editor.template', [
-                                'template' => $record->template_nome,
-                                '?versao=' . $record->id
-                              ])
+                                'template' => $record->template_id,
+                            ]) . '?versao=' . $record->id
                             : '#'
                     )
                     ->openUrlInNewTab()
-                    ->visible(fn ($record) => filled($record->id)),
+                    ->visible(fn ($record) => filled($record->template_id) && filled($record->id)),
             ])
+
             ->bulkActions([])
             ->selectable(false)
             ->defaultSort('data_criacao', 'desc')
@@ -108,11 +108,5 @@ class TemplateHistoricoResource extends Resource
         return [
             'index' => Pages\ListTemplateHistoricos::route('/'),
         ];
-    }
-
-    // Query padrão
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
     }
 }

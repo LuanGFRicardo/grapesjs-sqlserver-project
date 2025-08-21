@@ -10,6 +10,8 @@ use App\Traits\HandlesExceptions;
 
 class EditTemplate extends EditRecord
 {
+    use HandlesExceptions;
+
     protected static string $resource = TemplateResource::class;
 
     protected function afterSave(): void
@@ -18,20 +20,10 @@ class EditTemplate extends EditRecord
         $templateService = app(TemplateService::class);
 
         try {
-            // Normaliza e atualiza/cria template GrapesJS
-            $nomeNormalizado = $this->normalizarENomearTemplate($template, $templateService);
-            $templateService->atualizarOuCriarTemplate($nomeNormalizado, '');
+            $templateService->atualizarNomeTemplate($template->id, $template->nome);
         } catch (\Exception $e) {
             $this->handleException('Erro ao editar template:', $e);
         }
-    }
-
-    protected function getHeaderActions(): array
-    {
-        // Botão de deletar registro
-        return [
-            Actions\DeleteAction::make(),
-        ];
     }
 
     protected function getRedirectUrl(): string

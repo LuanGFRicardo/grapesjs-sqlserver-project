@@ -16,10 +16,10 @@ class TemplateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:255',
-            'html' => 'nullable|string',
-            'css' => 'nullable|string',
-            'projeto' => 'nullable|string',
+            'template_id' => 'required|integer|exists:templates,id',
+            'html'        => 'nullable|string',
+            'css'         => 'nullable|string',
+            'projeto'     => 'nullable|string',
         ];
     }
 }

@@ -150,10 +150,4 @@ class ComponenteResource extends Resource
             'edit' => Pages\EditComponente::route('/{record}/edit'),
         ];
     }
-
-    // Query Eloquent padrão (sem alterações)
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
-    }
 }
